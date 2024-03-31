@@ -1,9 +1,10 @@
+import { Provider as JotaiProvider } from "jotai";
+
 function App() {
   return (
-    <main>
-      <h1>Hello world</h1>
-      <button className="btn">Button</button>
-    </main>
+    <JotaiProvider>
+      <main></main>
+    </JotaiProvider>
   );
 }
 
