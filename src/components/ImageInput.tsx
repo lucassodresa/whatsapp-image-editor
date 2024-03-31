@@ -3,7 +3,7 @@ import { imageFileAtom } from "../atoms";
 import { ChangeEvent } from "react";
 
 export const ImageInput = () => {
-  const [, setImageFile] = useAtom(imageFileAtom);
+  const [imageFile, setImageFile] = useAtom(imageFileAtom);
 
   const handleChange = ({ target }: ChangeEvent<HTMLInputElement>) => {
     const file = target.files?.[0];
@@ -18,6 +18,8 @@ export const ImageInput = () => {
 
     setImageFile(file);
   };
+
+  if (imageFile) return null;
 
   return (
     <input

@@ -4,7 +4,7 @@ import App from "./App";
 import { Provider as JotaiProvider } from "jotai";
 
 describe("ImageInput", () => {
-  it("renders correctly an input tag that only accepts image file types", () => {
+  it("should renders correctly an input tag that only accepts image file types", () => {
     const { queryByTestId } = render(
       <JotaiProvider>
         <App />
@@ -49,5 +49,21 @@ describe("ImageInput", () => {
     fireEvent.change(imageInput, { target: { files: [file] } });
 
     expect(imageInput.files).toEqual(null);
+  });
+
+  it("should not renders an input file if an image file is loaded", () => {
+    const file = new File(["some-file-data"], "test.png", {
+      type: "image/png",
+    });
+    const { queryByTestId } = render(
+      <JotaiProvider>
+        <App />
+      </JotaiProvider>
+    );
+
+    const imageInput = queryByTestId("image-input") as HTMLInputElement;
+    fireEvent.change(imageInput, { target: { files: [file] } });
+
+    expect(imageInput).not.toBeInTheDocument();
   });
 });
