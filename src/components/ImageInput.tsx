@@ -5,13 +5,16 @@ import { ChangeEvent } from "react";
 export const ImageInput = () => {
   const [, setImageFile] = useAtom(imageFileAtom);
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+  const handleChange = ({ target }: ChangeEvent<HTMLInputElement>) => {
+    const file = target.files?.[0];
 
     if (!file) return;
 
     const isImageType = file.type.startsWith("image/");
-    if (!isImageType) return;
+    if (!isImageType) {
+      target.value = "";
+      target.files = null;
+    }
 
     setImageFile(file);
   };
