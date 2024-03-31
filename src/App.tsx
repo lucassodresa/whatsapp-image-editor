@@ -1,10 +1,14 @@
-import { Provider as JotaiProvider } from "jotai";
+// import { useAtom } from "jotai";
+import { ImageInput } from "./components/ImageInput";
+// import { imageFileAtom } from "./atoms";
 
 function App() {
+  // const [imageFile] = useAtom(imageFileAtom);
+
   return (
-    <JotaiProvider>
-      <main></main>
-    </JotaiProvider>
+    <main>
+      <ImageInput />
+    </main>
   );
 }
 
