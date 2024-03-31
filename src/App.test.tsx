@@ -49,6 +49,7 @@ describe("ImageInput", () => {
     fireEvent.change(imageInput, { target: { files: [file] } });
 
     expect(imageInput.files).toEqual(null);
+    expect(imageInput).toBeInTheDocument();
   });
 
   it("should not renders an input file if an image file is loaded", () => {

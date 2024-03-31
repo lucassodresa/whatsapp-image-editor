@@ -14,6 +14,7 @@ export const ImageInput = () => {
     if (!isImageType) {
       target.value = "";
       target.files = null;
+      return;
     }
 
     setImageFile(file);
@@ -23,6 +24,7 @@ export const ImageInput = () => {
 
   return (
     <input
+      className="file-input file-input-bordered file-input-primary w-full max-w-xs"
       data-testid="image-input"
       type="file"
       accept="image/*"
