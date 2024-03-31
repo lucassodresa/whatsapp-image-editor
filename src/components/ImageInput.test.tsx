@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { render, fireEvent } from "@testing-library/react";
 import { ImageInput } from "./ImageInput";
 import "@testing-library/jest-dom";
 
@@ -14,7 +14,17 @@ describe("ImageInput", () => {
     expect(imageInput).toHaveAttribute("accept", "image/*");
   });
 
-  it.todo("should load an image file");
+  it("should load an image file", () => {
+    const file = new File(["some-file-data"], "test.png", {
+      type: "image/png",
+    });
+    const { queryByTestId } = render(<ImageInput />);
+    const imageInput = queryByTestId("image-input") as HTMLInputElement;
+
+    fireEvent.change(imageInput, { target: { files: [file] } });
+
+    expect(imageInput.files).toEqual([file]);
+  });
 
   it.todo("should accept only image file type");
 });
