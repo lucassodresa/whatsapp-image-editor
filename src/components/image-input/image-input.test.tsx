@@ -1,15 +1,10 @@
-import { render, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { Provider as JotaiProvider } from "jotai";
 import { ImageInput } from ".";
+import { fireEvent, render } from "../../test-utils";
 
 describe("ImageInput", () => {
   it("should renders correctly an input tag that only accepts image file types", () => {
-    const { queryByTestId } = render(
-      <JotaiProvider>
-        <ImageInput />
-      </JotaiProvider>
-    );
+    const { queryByTestId } = render(<ImageInput />);
 
     const imageInput = queryByTestId("image-input");
 
@@ -19,52 +14,29 @@ describe("ImageInput", () => {
     expect(imageInput).toHaveAttribute("accept", "image/*");
   });
 
-  it("should load an image file", () => {
+  it("should load an image file and remove input from screen", async () => {
     const file = new File(["some-file-data"], "test.png", {
       type: "image/png",
     });
-    const { queryByTestId } = render(
-      <JotaiProvider>
-        <ImageInput />
-      </JotaiProvider>
-    );
+    const { queryByTestId } = render(<ImageInput />);
 
     const imageInput = queryByTestId("image-input") as HTMLInputElement;
     fireEvent.change(imageInput, { target: { files: [file] } });
 
     expect(imageInput.files).toEqual([file]);
+    expect(imageInput).not.toBeInTheDocument();
   });
 
-  it("should not load a file different of image type", () => {
+  it("should not load a file different of image type", async () => {
     const file = new File(["some-file-data"], "test.txt", {
       type: "text/plain",
     });
-    const { queryByTestId } = render(
-      <JotaiProvider>
-        <ImageInput />
-      </JotaiProvider>
-    );
+    const { queryByTestId } = render(<ImageInput />);
 
     const imageInput = queryByTestId("image-input") as HTMLInputElement;
     fireEvent.change(imageInput, { target: { files: [file] } });
 
     expect(imageInput.files).toEqual(null);
     expect(imageInput).toBeInTheDocument();
-  });
-
-  it("should not renders an input file if an image file is loaded", () => {
-    const file = new File(["some-file-data"], "test.png", {
-      type: "image/png",
-    });
-    const { queryByTestId } = render(
-      <JotaiProvider>
-        <ImageInput />
-      </JotaiProvider>
-    );
-
-    const imageInput = queryByTestId("image-input") as HTMLInputElement;
-    fireEvent.change(imageInput, { target: { files: [file] } });
-
-    expect(imageInput).not.toBeInTheDocument();
   });
 });
