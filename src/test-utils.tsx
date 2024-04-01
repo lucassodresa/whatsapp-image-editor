@@ -4,35 +4,43 @@ import { Provider as JotaiProvider } from "jotai";
 import { useHydrateAtoms } from "jotai/utils";
 import type { WritableAtom } from "jotai/vanilla";
 type AnyWritableAtom = WritableAtom<unknown, never[], unknown>;
-type InitialValues = [AnyWritableAtom, never][];
+export type jotaiInitialValues = [AnyWritableAtom, never][];
 
-const TestProvider = ({
-  initialValues,
+const HydrateAtoms = ({
+  jotaiInitialValues,
   children,
 }: {
   children: ReactNode;
-  initialValues: InitialValues;
+  jotaiInitialValues: jotaiInitialValues;
 }) => {
-  useHydrateAtoms(initialValues);
-
-  return <JotaiProvider>{children}</JotaiProvider>;
+  useHydrateAtoms(jotaiInitialValues);
+  return children;
 };
 
-const GetAllTheProviders =
-  (initialValues: InitialValues) =>
-  ({ children }: { children: ReactNode }) =>
-    <TestProvider initialValues={initialValues}>{children}</TestProvider>;
+const TestProvider = ({
+  jotaiInitialValues,
+  children,
+}: {
+  children: ReactNode;
+  jotaiInitialValues: jotaiInitialValues;
+}) => (
+  <JotaiProvider>
+    <HydrateAtoms jotaiInitialValues={jotaiInitialValues}>
+      {children}
+    </HydrateAtoms>
+  </JotaiProvider>
+);
 
 const customRender = (
   ui: ReactElement,
-  options?: Omit<RenderOptions, "wrapper"> & {
-    initialValues: InitialValues;
-  }
+  options?: RenderOptions & { jotaiInitialValues: jotaiInitialValues }
 ) =>
-  render(ui, {
-    wrapper: GetAllTheProviders(options?.initialValues || []),
-    ...options,
-  });
+  render(
+    <TestProvider jotaiInitialValues={options?.jotaiInitialValues || []}>
+      {ui}
+    </TestProvider>,
+    options
+  );
 
 // eslint-disable-next-line react-refresh/only-export-components
 export * from "@testing-library/react";
