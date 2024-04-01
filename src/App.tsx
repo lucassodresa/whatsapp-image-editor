@@ -1,8 +1,8 @@
-import { ImageInput } from "./components/ImageInput";
+import { ImageInput } from "./components/image-input/image-input";
 
 function App() {
   return (
-    <main>
+    <main className="w-dvw h-dvh flex justify-center items-center">
       <ImageInput />
     </main>
   );

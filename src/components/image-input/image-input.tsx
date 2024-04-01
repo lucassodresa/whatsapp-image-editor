@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import { imageFileAtom } from "../atoms";
+import { imageFileAtom } from "../../atoms";
 import { ChangeEvent } from "react";
 
 export const ImageInput = () => {

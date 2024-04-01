@@ -1,13 +1,13 @@
 import { render, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import App from "./App";
 import { Provider as JotaiProvider } from "jotai";
+import { ImageInput } from ".";
 
 describe("ImageInput", () => {
   it("should renders correctly an input tag that only accepts image file types", () => {
     const { queryByTestId } = render(
       <JotaiProvider>
-        <App />
+        <ImageInput />
       </JotaiProvider>
     );
 
@@ -25,7 +25,7 @@ describe("ImageInput", () => {
     });
     const { queryByTestId } = render(
       <JotaiProvider>
-        <App />
+        <ImageInput />
       </JotaiProvider>
     );
 
@@ -41,7 +41,7 @@ describe("ImageInput", () => {
     });
     const { queryByTestId } = render(
       <JotaiProvider>
-        <App />
+        <ImageInput />
       </JotaiProvider>
     );
 
@@ -58,7 +58,7 @@ describe("ImageInput", () => {
     });
     const { queryByTestId } = render(
       <JotaiProvider>
-        <App />
+        <ImageInput />
       </JotaiProvider>
     );
 
