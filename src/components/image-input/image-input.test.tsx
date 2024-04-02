@@ -24,7 +24,8 @@ describe("ImageInput", () => {
     fireEvent.change(imageInput, { target: { files: [file] } });
 
     expect(imageInput.files).toEqual([file]);
-    expect(imageInput).not.toBeInTheDocument();
+    expect(imageInput).toBeInTheDocument();
+    expect(imageInput).toHaveClass("hidden");
   });
 
   it("should not load a file different of image type", async () => {
@@ -38,5 +39,6 @@ describe("ImageInput", () => {
 
     expect(imageInput.files).toEqual(null);
     expect(imageInput).toBeInTheDocument();
+    expect(imageInput).not.toHaveClass("hidden");
   });
 });

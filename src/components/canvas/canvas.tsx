@@ -1,10 +1,16 @@
 import { useAtomValue } from "jotai";
 import { imageFileAtom } from "../../atoms";
+import { ForwardedRef, forwardRef } from "react";
+import clsx from "clsx";
 
-export const Canvas = () => {
+export const Canvas = forwardRef((_, ref: ForwardedRef<HTMLCanvasElement>) => {
   const imageFile = useAtomValue(imageFileAtom);
 
-  if (!imageFile) return null;
-
-  return <canvas data-testid="canvas"></canvas>;
-};
+  return (
+    <canvas
+      ref={ref}
+      data-testid="canvas"
+      className={clsx(!imageFile && "hidden", "max-w-full max-h-full")}
+    ></canvas>
+  );
+});
