@@ -9,11 +9,16 @@ export const useCanvas = ({
 }) => {
   const generateDownloadCanvasByImageType = useCallback(
     (imageType: ImageType) => () => {
-      if (!VALID_IMAGE_TYPES.includes(imageType))
-        throw new Error("Invalid image type");
+      if (!VALID_IMAGE_TYPES.includes(imageType)) {
+        console.error("Invalid image type");
+        return;
+      }
 
-      const url = canvasRef.current?.toDataURL(`image/${imageType}`);
-      if (!url) throw new Error("Canvas is not available");
+      const url = canvasRef.current?.toDataURL?.(`image/${imageType}`);
+      if (!url) {
+        console.error("Canvas is not available");
+        return;
+      }
 
       const anchorElement = document.createElement("a");
       anchorElement.href = url;
@@ -26,20 +31,29 @@ export const useCanvas = ({
 
   const drawImage = useCallback(
     (imageFile: File) => {
-      if (!imageFile) throw new Error("Image file does not exists");
+      if (!imageFile) {
+        console.error("Image file does not exists");
+        return;
+      }
 
       const canvas = canvasRef?.current;
-      if (!canvas) throw new Error("Canvas does not exists");
+      if (!canvas) {
+        console.error("Canvas does not exists");
+        return;
+      }
 
-      const canvasContext = canvas?.getContext?.("2d");
-      if (!canvasContext) throw new Error("Canvas context does not exists");
+      const context = canvas?.getContext?.("2d");
+      if (!context) {
+        console.error("Canvas context does not exists");
+        return;
+      }
 
       const image = new Image();
       image.onload = () => {
         canvas.width = image.width;
         canvas.height = image.height;
 
-        canvasContext.drawImage(image, 0, 0, image.width, image.height);
+        context.drawImage(image, 0, 0, image.width, image.height);
       };
 
       const fileReader = new FileReader();
@@ -52,12 +66,18 @@ export const useCanvas = ({
     [canvasRef]
   );
 
-  const drawLineWithMouse = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+  const drawLineWithMouse = useCallback(() => {
+    const canvas = canvasRef?.current;
+    if (!canvas) {
+      console.error("Canvas does not exists");
+      return;
+    }
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const context = canvas?.getContext?.("2d");
+    if (!context) {
+      console.error("Canvas context does not exists");
+      return;
+    }
 
     let isDrawing = false;
     let lastX = 0;
@@ -71,22 +91,20 @@ export const useCanvas = ({
     canvas.addEventListener("mousemove", (event) => {
       if (!isDrawing) return;
 
-      ctx.beginPath();
-      ctx.lineWidth = 10;
-      ctx.lineJoin = "round";
-      ctx.lineCap = "round";
-      ctx.strokeStyle = "red";
+      context.beginPath();
+      context.lineWidth = 10;
+      context.lineJoin = "round";
+      context.lineCap = "round";
+      context.strokeStyle = "red";
 
       const moveToX = (lastX * canvas.width) / canvas.offsetWidth;
       const moveToY = (lastY * canvas.height) / canvas.offsetHeight;
-
       const lineToX = (event.offsetX * canvas.width) / canvas.offsetWidth;
       const lineToY = (event.offsetY * canvas.height) / canvas.offsetHeight;
 
-      ctx.moveTo(moveToX, moveToY);
-
-      ctx.lineTo(lineToX, lineToY);
-      ctx.stroke();
+      context.moveTo(moveToX, moveToY);
+      context.lineTo(lineToX, lineToY);
+      context.stroke();
 
       [lastX, lastY] = [event.offsetX, event.offsetY];
     });
@@ -98,7 +116,7 @@ export const useCanvas = ({
     canvas.addEventListener("mouseout", () => {
       isDrawing = false;
     });
-  };
+  }, [canvasRef]);
 
   return {
     generateDownloadCanvasByImageType,

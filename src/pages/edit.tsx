@@ -17,13 +17,12 @@ export const Edit = () => {
 
   useEffect(() => {
     if (!imageFile) navigate("/");
-  });
+  }, [imageFile, navigate]);
 
   const handleClear = () => setImageFile(null);
 
-  imageFile && drawImage(imageFile);
-
-  drawLineWithMouse();
+  imageFile && canvasRef.current && drawImage(imageFile);
+  canvasRef.current && drawLineWithMouse();
 
   return (
     <main className="w-dvw h-dvh">

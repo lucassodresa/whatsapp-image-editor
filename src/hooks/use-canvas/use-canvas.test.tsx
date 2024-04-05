@@ -5,6 +5,48 @@ import { RefObject } from "react";
 
 describe("useCanvas", () => {
   describe("generateDownloadCanvasByImageType", () => {
+    it("shoud throw an error if the image type is invalid", () => {
+      const mockToDataURL = jest.fn(() => "some-url");
+      const mockCanvasRef = {
+        current: { toDataURL: mockToDataURL } as unknown,
+      } as RefObject<HTMLCanvasElement>;
+
+      const { result } = renderHook(() =>
+        useCanvas({ canvasRef: mockCanvasRef })
+      );
+
+      global.console.error = jest.fn();
+      const { generateDownloadCanvasByImageType } = result.current;
+
+      const invalidImageType = "invalid-type";
+      const downloadCanvas =
+        generateDownloadCanvasByImageType(invalidImageType);
+      downloadCanvas();
+
+      expect(global.console.error).toHaveBeenCalledWith("Invalid image type");
+    });
+
+    it("shoud throw an error if canvas is not available", () => {
+      const mockCanvasRef = {
+        current: undefined as unknown,
+      } as RefObject<HTMLCanvasElement>;
+
+      const { result } = renderHook(() =>
+        useCanvas({ canvasRef: mockCanvasRef })
+      );
+
+      global.console.error = jest.fn();
+      const { generateDownloadCanvasByImageType } = result.current;
+
+      const validImageType = VALID_IMAGE_TYPES[0];
+      const downloadCanvas = generateDownloadCanvasByImageType(validImageType);
+      downloadCanvas();
+
+      expect(global.console.error).toHaveBeenCalledWith(
+        "Canvas is not available"
+      );
+    });
+
     it("should generate a function that when execute download an image by type", () => {
       const mockToDataURL = jest.fn(() => "some-url");
       const mockCanvasRef = {
@@ -38,79 +80,6 @@ describe("useCanvas", () => {
         expect(mockAnchorElement.download).toBe("download-this-canvas");
       });
     });
-
-    it("shoud throw an error if the image type is invalid", () => {
-      const mockToDataURL = jest.fn(() => "some-url");
-      const mockCanvasRef = {
-        current: { toDataURL: mockToDataURL } as unknown,
-      } as RefObject<HTMLCanvasElement>;
-
-      const { result } = renderHook(() =>
-        useCanvas({ canvasRef: mockCanvasRef })
-      );
-      const { generateDownloadCanvasByImageType } = result.current;
-
-      const mockAnchorElement = {
-        download: "",
-        href: "",
-        click: jest.fn(),
-        remove: jest.fn(),
-      } as unknown as HTMLAnchorElement;
-      const mockCreateElement = jest
-        .spyOn(document, "createElement")
-        .mockReturnValue(mockAnchorElement);
-
-      const invalidImageType = "invalid-type";
-      const downloadCanvas =
-        generateDownloadCanvasByImageType(invalidImageType);
-
-      expect(() => downloadCanvas()).toThrow("Invalid image type");
-      expect(mockToDataURL).not.toHaveBeenCalledWith(
-        `image/${invalidImageType}`
-      );
-      expect(mockCreateElement).not.toHaveBeenCalledWith("a");
-      expect(mockAnchorElement.click).not.toHaveBeenCalled();
-      expect(mockAnchorElement.remove).not.toHaveBeenCalled();
-      expect(mockAnchorElement.href).not.toBe("some-url");
-      expect(mockAnchorElement.download).not.toBe("download-this-canvas");
-    });
-
-    it("shoud throw an error if canvas is not available", () => {
-      const mockToDataURL = jest.fn(() => "some-url");
-      const mockCanvasRef = {
-        current: undefined as unknown,
-      } as RefObject<HTMLCanvasElement>;
-
-      const { result } = renderHook(() =>
-        useCanvas({ canvasRef: mockCanvasRef })
-      );
-      const { generateDownloadCanvasByImageType } = result.current;
-
-      const mockAnchorElement = {
-        download: "",
-        href: "",
-        click: jest.fn(),
-        remove: jest.fn(),
-      } as unknown as HTMLAnchorElement;
-      const mockCreateElement = jest
-        .spyOn(document, "createElement")
-        .mockReturnValue(mockAnchorElement);
-
-      const validImageType = VALID_IMAGE_TYPES[0];
-      const downloadCanvas = generateDownloadCanvasByImageType(validImageType);
-
-      expect(() => downloadCanvas()).toThrow("Canvas is not available");
-      expect(mockToDataURL).not.toHaveBeenCalledWith(`image/${validImageType}`);
-      expect(mockCreateElement).not.toHaveBeenCalledWith("a");
-      expect(mockAnchorElement.click).not.toHaveBeenCalled();
-      expect(mockAnchorElement.remove).not.toHaveBeenCalled();
-      expect(mockAnchorElement.href).not.toBe("some-url");
-      expect(mockAnchorElement.download).not.toBe("download-this-canvas");
-    });
-
-    it.todo(
-      "shoud throw an error if something goes wrong while downloading image from canvas"
-    );
   });
 
   describe("drawImage", () => {
@@ -122,9 +91,12 @@ describe("useCanvas", () => {
       const { result } = renderHook(() =>
         useCanvas({ canvasRef: invalidCanvasRef })
       );
-      const { drawImage } = result.current;
 
-      expect(() => drawImage(invalidImageFile)).toThrow(
+      global.console.error = jest.fn();
+      const { drawImage } = result.current;
+      drawImage(invalidImageFile);
+
+      expect(global.console.error).toHaveBeenCalledWith(
         "Image file does not exists"
       );
     });
@@ -137,9 +109,14 @@ describe("useCanvas", () => {
       const { result } = renderHook(() =>
         useCanvas({ canvasRef: invalidCanvasRef })
       );
-      const { drawImage } = result.current;
 
-      expect(() => drawImage(validImageFile)).toThrow("Canvas does not exists");
+      global.console.error = jest.fn();
+      const { drawImage } = result.current;
+      drawImage(validImageFile);
+
+      expect(global.console.error).toHaveBeenCalledWith(
+        "Canvas does not exists"
+      );
     });
 
     it("should throw an error if canvas context does not exists", () => {
@@ -151,9 +128,12 @@ describe("useCanvas", () => {
       const { result } = renderHook(() =>
         useCanvas({ canvasRef: mockCanvasRefWithInvalidGetContext })
       );
-      const { drawImage } = result.current;
 
-      expect(() => drawImage(validImageFile)).toThrow(
+      global.console.error = jest.fn();
+      const { drawImage } = result.current;
+      drawImage(validImageFile);
+
+      expect(global.console.error).toHaveBeenCalledWith(
         "Canvas context does not exists"
       );
     });
@@ -214,5 +194,42 @@ describe("useCanvas", () => {
 
       expect(mockImageInstance.src).toBe("some-url");
     });
+  });
+
+  describe("drawLineWithMouse", () => {
+    it("should throw an error if canvas does not exists", () => {
+      const invalidCanvasRef =
+        undefined as unknown as RefObject<HTMLCanvasElement>;
+
+      const { result } = renderHook(() =>
+        useCanvas({ canvasRef: invalidCanvasRef })
+      );
+
+      global.console.error = jest.fn();
+      const { drawLineWithMouse } = result.current;
+      drawLineWithMouse();
+
+      expect(global.console.error).toHaveBeenCalledWith(
+        "Canvas does not exists"
+      );
+    });
+  });
+
+  it("should throw an error if canvas context does not exists", () => {
+    const mockCanvasRefWithInvalidGetContext = {
+      current: {} as unknown,
+    } as RefObject<HTMLCanvasElement>;
+
+    const { result } = renderHook(() =>
+      useCanvas({ canvasRef: mockCanvasRefWithInvalidGetContext })
+    );
+
+    global.console.error = jest.fn();
+    const { drawLineWithMouse } = result.current;
+    drawLineWithMouse();
+
+    expect(global.console.error).toHaveBeenCalledWith(
+      "Canvas context does not exists"
+    );
   });
 });
