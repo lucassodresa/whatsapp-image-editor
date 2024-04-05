@@ -9,7 +9,7 @@ export const useCanvas = ({
 }) => {
   const generateDownloadCanvasByImageType = useCallback(
     (imageType: ImageType) => () => {
-      if (VALID_IMAGE_TYPES.includes(imageType) === false)
+      if (!VALID_IMAGE_TYPES.includes(imageType))
         throw new Error("Invalid image type");
 
       const url = canvasRef.current?.toDataURL(`image/${imageType}`);
@@ -24,27 +24,33 @@ export const useCanvas = ({
     [canvasRef]
   );
 
-  const drawImage = (imageFile: File) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+  const drawImage = useCallback(
+    (imageFile: File) => {
+      if (!imageFile) throw new Error("Image file does not exists");
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+      const canvas = canvasRef?.current;
+      if (!canvas) throw new Error("Canvas does not exists");
 
-    const image = new Image();
-    const fileReader = new FileReader();
-    fileReader.readAsDataURL(imageFile);
+      const canvasContext = canvas?.getContext?.("2d");
+      if (!canvasContext) throw new Error("Canvas context does not exists");
 
-    fileReader.onload = () => {
+      const image = new Image();
       image.onload = () => {
         canvas.width = image.width;
         canvas.height = image.height;
 
-        ctx.drawImage(image, 0, 0, image.width, image.height);
+        canvasContext.drawImage(image, 0, 0, image.width, image.height);
       };
-      image.src = fileReader.result as string;
-    };
-  };
+
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(imageFile);
+
+      fileReader.onload = ({ target }) => {
+        image.src = target?.result as string;
+      };
+    },
+    [canvasRef]
+  );
 
   const drawLineWithMouse = () => {
     const canvas = canvasRef.current;
