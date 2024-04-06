@@ -10,10 +10,9 @@ export const Edit = () => {
   const navigate = useNavigate();
   const [imageFile, setImageFile] = useAtom(imageFileAtom);
 
-  const { drawImage, generateDownloadCanvasByImageType, drawLineWithMouse } =
-    useCanvas({
-      canvasRef,
-    });
+  const { drawImage, generateDownloadCanvasByImageType } = useCanvas({
+    canvasRef,
+  });
 
   useEffect(() => {
     if (!imageFile) navigate("/");
@@ -22,7 +21,6 @@ export const Edit = () => {
   const handleClear = () => setImageFile(null);
 
   imageFile && canvasRef.current && drawImage(imageFile);
-  canvasRef.current && drawLineWithMouse();
 
   return (
     <main className="w-dvw h-dvh">

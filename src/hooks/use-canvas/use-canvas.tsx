@@ -1,4 +1,4 @@
-import { RefObject, useCallback } from "react";
+import { RefObject, useCallback, useEffect } from "react";
 export const VALID_IMAGE_TYPES = ["png", "jpeg", "jpg", "webp"];
 type ImageType = (typeof VALID_IMAGE_TYPES)[number];
 
@@ -66,7 +66,7 @@ export const useCanvas = ({
     [canvasRef]
   );
 
-  const drawLineWithMouse = useCallback(() => {
+  useEffect(() => {
     const canvas = canvasRef?.current;
     if (!canvas) {
       console.error("Canvas does not exists");
@@ -83,12 +83,12 @@ export const useCanvas = ({
     let lastX = 0;
     let lastY = 0;
 
-    canvas.addEventListener("mousedown", (event) => {
+    const handleMouseDown = (event: MouseEvent) => {
       isDrawing = true;
       [lastX, lastY] = [event.offsetX, event.offsetY];
-    });
+    };
 
-    canvas.addEventListener("mousemove", (event) => {
+    const handleMouseMove = (event: MouseEvent) => {
       if (!isDrawing) return;
 
       context.beginPath();
@@ -107,20 +107,26 @@ export const useCanvas = ({
       context.stroke();
 
       [lastX, lastY] = [event.offsetX, event.offsetY];
-    });
+    };
 
-    canvas.addEventListener("mouseup", () => {
-      isDrawing = false;
-    });
+    const handleMouseUp = () => (isDrawing = false);
+    const handleMouseOut = () => (isDrawing = false);
 
-    canvas.addEventListener("mouseout", () => {
-      isDrawing = false;
-    });
+    canvas.addEventListener("mousedown", handleMouseDown);
+    canvas.addEventListener("mousemove", handleMouseMove);
+    canvas.addEventListener("mouseup", handleMouseUp);
+    canvas.addEventListener("mouseout", handleMouseOut);
+
+    () => {
+      canvas.removeEventListener("mousedown", handleMouseDown);
+      canvas.removeEventListener("mousemove", handleMouseMove);
+      canvas.removeEventListener("mouseup", handleMouseUp);
+      canvas.removeEventListener("mouseout", handleMouseOut);
+    };
   }, [canvasRef]);
 
   return {
     generateDownloadCanvasByImageType,
     drawImage,
-    drawLineWithMouse,
   };
 };
