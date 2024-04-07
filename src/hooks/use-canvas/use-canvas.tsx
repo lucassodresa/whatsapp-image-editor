@@ -1,4 +1,4 @@
-import { RefObject, useCallback, useEffect } from "react";
+import { RefObject, useCallback, useEffect, useRef } from "react";
 export const VALID_IMAGE_TYPES = ["png", "jpeg", "jpg", "webp"];
 type ImageType = (typeof VALID_IMAGE_TYPES)[number];
 
@@ -66,6 +66,8 @@ export const useCanvas = ({
     [canvasRef]
   );
 
+  const lastAxisCordinatesRef = useRef<number[]>([]);
+
   useEffect(() => {
     const canvas = canvasRef?.current;
     if (!canvas) {
@@ -79,16 +81,14 @@ export const useCanvas = ({
       return;
     }
 
-    let isDrawing = false;
-    let lastX = 0;
-    let lastY = 0;
-
-    const handleMouseDown = (event: MouseEvent) => {
-      isDrawing = true;
-      [lastX, lastY] = [event.offsetX, event.offsetY];
+    const handleMouseDown = ({ offsetX, offsetY }: MouseEvent) => {
+      lastAxisCordinatesRef.current = [offsetX, offsetY];
     };
 
-    const handleMouseMove = (event: MouseEvent) => {
+    const handleMouseMove = ({ offsetX, offsetY }: MouseEvent) => {
+      const lastAxisCordinates = lastAxisCordinatesRef.current;
+      const isDrawing = lastAxisCordinates.length !== 0;
+
       if (!isDrawing) return;
 
       context.beginPath();
@@ -97,20 +97,26 @@ export const useCanvas = ({
       context.lineCap = "round";
       context.strokeStyle = "red";
 
+      const [lastX, lastY] = lastAxisCordinates;
+
       const moveToX = (lastX * canvas.width) / canvas.offsetWidth;
       const moveToY = (lastY * canvas.height) / canvas.offsetHeight;
-      const lineToX = (event.offsetX * canvas.width) / canvas.offsetWidth;
-      const lineToY = (event.offsetY * canvas.height) / canvas.offsetHeight;
+      const lineToX = (offsetX * canvas.width) / canvas.offsetWidth;
+      const lineToY = (offsetY * canvas.height) / canvas.offsetHeight;
 
       context.moveTo(moveToX, moveToY);
       context.lineTo(lineToX, lineToY);
       context.stroke();
 
-      [lastX, lastY] = [event.offsetX, event.offsetY];
+      lastAxisCordinatesRef.current = [offsetX, offsetY];
     };
 
-    const handleMouseUp = () => (isDrawing = false);
-    const handleMouseOut = () => (isDrawing = false);
+    const handleMouseUp = () => {
+      lastAxisCordinatesRef.current = [];
+    };
+    const handleMouseOut = () => {
+      lastAxisCordinatesRef.current = [];
+    };
 
     canvas.addEventListener("mousedown", handleMouseDown);
     canvas.addEventListener("mousemove", handleMouseMove);

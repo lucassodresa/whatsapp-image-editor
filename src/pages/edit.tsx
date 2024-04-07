@@ -15,12 +15,12 @@ export const Edit = () => {
   });
 
   useEffect(() => {
-    if (!imageFile) navigate("/");
-  }, [imageFile, navigate]);
+    if (!imageFile) return navigate("/");
+
+    drawImage(imageFile);
+  }, [imageFile, navigate, drawImage]);
 
   const handleClear = () => setImageFile(null);
-
-  imageFile && canvasRef.current && drawImage(imageFile);
 
   return (
     <main className="w-dvw h-dvh">
