@@ -3,12 +3,13 @@ import { useMouseDrawLine } from ".";
 import { renderHook } from "@testing-library/react";
 import { RefObject } from "react";
 
+global.console.error = jest.fn();
+
 describe("useMouseDrawLine", () => {
   it("should throw an error if canvas does not exists", () => {
     const invalidCanvasRef =
       undefined as unknown as RefObject<HTMLCanvasElement>;
 
-    global.console.error = jest.fn();
     renderHook(() => useMouseDrawLine({ canvasRef: invalidCanvasRef }));
 
     expect(global.console.error).toHaveBeenCalledWith("Canvas does not exists");
@@ -18,7 +19,6 @@ describe("useMouseDrawLine", () => {
     const mockCanvasRefWithInvalidGetContext = {
       current: {} as unknown,
     } as RefObject<HTMLCanvasElement>;
-    global.console.error = jest.fn();
 
     renderHook(() =>
       useMouseDrawLine({ canvasRef: mockCanvasRefWithInvalidGetContext })

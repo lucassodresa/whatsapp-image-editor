@@ -11,13 +11,12 @@ jest.mock("./hooks", () => ({
   useMouseDrawLine: jest.fn(),
 }));
 
+global.console.error = jest.fn();
+
 describe("useCanvas", () => {
   describe("generateDownloadCanvasByImageType", () => {
     it("shoud throw an error if the image type is invalid", () => {
-      const mockToDataURL = jest.fn(() => "some-url");
-      const mockCanvasRef = {
-        current: { toDataURL: mockToDataURL } as unknown,
-      } as RefObject<HTMLCanvasElement>;
+      const mockCanvasRef = {} as RefObject<HTMLCanvasElement>;
 
       const { result } = renderHook(() =>
         useCanvas({ canvasRef: mockCanvasRef })
@@ -26,7 +25,6 @@ describe("useCanvas", () => {
         canvasRef: mockCanvasRef,
       });
 
-      global.console.error = jest.fn();
       const { generateDownloadCanvasByImageType } = result.current;
 
       const invalidImageType = "invalid-type";
@@ -38,9 +36,7 @@ describe("useCanvas", () => {
     });
 
     it("shoud throw an error if canvas is not available", () => {
-      const mockCanvasRef = {
-        current: undefined as unknown,
-      } as RefObject<HTMLCanvasElement>;
+      const mockCanvasRef = {} as RefObject<HTMLCanvasElement>;
 
       const { result } = renderHook(() =>
         useCanvas({ canvasRef: mockCanvasRef })
@@ -49,7 +45,6 @@ describe("useCanvas", () => {
         canvasRef: mockCanvasRef,
       });
 
-      global.console.error = jest.fn();
       const { generateDownloadCanvasByImageType } = result.current;
 
       const validImageType = VALID_IMAGE_TYPES[0];
@@ -62,10 +57,11 @@ describe("useCanvas", () => {
     });
 
     it("should generate a function that when execute download an image by type", () => {
-      const mockToDataURL = jest.fn(() => "some-url");
+      const mockCanvas = document.createElement("canvas");
+      mockCanvas.toDataURL = jest.fn(() => "some-url");
       const mockCanvasRef = {
-        current: { toDataURL: mockToDataURL } as unknown,
-      } as RefObject<HTMLCanvasElement>;
+        current: mockCanvas,
+      };
 
       const { result } = renderHook(() =>
         useCanvas({ canvasRef: mockCanvasRef })
@@ -91,7 +87,7 @@ describe("useCanvas", () => {
         const downloadCanvas = generateDownloadCanvasByImageType(imageType);
         downloadCanvas();
 
-        expect(mockToDataURL).toHaveBeenCalledWith(`image/${imageType}`);
+        expect(mockCanvas.toDataURL).toHaveBeenCalledWith(`image/${imageType}`);
         expect(mockCreateElement).toHaveBeenCalledWith("a");
         expect(mockAnchorElement.click).toHaveBeenCalled();
         expect(mockAnchorElement.remove).toHaveBeenCalled();
@@ -103,8 +99,7 @@ describe("useCanvas", () => {
 
   describe("drawImage", () => {
     it("should throw an error if image file does not exists", () => {
-      const invalidCanvasRef =
-        undefined as unknown as RefObject<HTMLCanvasElement>;
+      const invalidCanvasRef = null as unknown as RefObject<HTMLCanvasElement>;
       const invalidImageFile = undefined as unknown as File;
 
       const { result } = renderHook(() =>
@@ -114,7 +109,6 @@ describe("useCanvas", () => {
         canvasRef: invalidCanvasRef,
       });
 
-      global.console.error = jest.fn();
       const { drawImage } = result.current;
       drawImage(invalidImageFile);
 
@@ -135,7 +129,6 @@ describe("useCanvas", () => {
         canvasRef: invalidCanvasRef,
       });
 
-      global.console.error = jest.fn();
       const { drawImage } = result.current;
       drawImage(validImageFile);
 
@@ -146,7 +139,7 @@ describe("useCanvas", () => {
 
     it("should throw an error if canvas context does not exists", () => {
       const mockCanvasRefWithInvalidGetContext = {
-        current: {} as unknown,
+        current: {},
       } as RefObject<HTMLCanvasElement>;
       const validImageFile = new File([""], "image.png");
 
@@ -158,7 +151,6 @@ describe("useCanvas", () => {
         canvasRef: mockCanvasRefWithInvalidGetContext,
       });
 
-      global.console.error = jest.fn();
       const { drawImage } = result.current;
       drawImage(validImageFile);
 
@@ -168,15 +160,23 @@ describe("useCanvas", () => {
     });
 
     it("should draw the image on canvas", () => {
-      const mockDrawImage = jest.fn();
-      const mockGetContext = jest.fn(() => ({ drawImage: mockDrawImage }));
-      const mockCanvasRef = {
-        current: { getContext: mockGetContext } as unknown,
-      } as RefObject<HTMLCanvasElement>;
+      const mockedDrawImage = jest.fn();
+      const mockCanvasRef = jest.mocked({
+        current: {
+          getContext: jest
+            .fn()
+            .mockImplementation(() => ({ drawImage: mockedDrawImage })),
+          width: 0,
+          height: 0,
+        },
+      });
+
       const validImageFile = new File([""], "image.png");
 
       const { result } = renderHook(() =>
-        useCanvas({ canvasRef: mockCanvasRef })
+        useCanvas({
+          canvasRef: mockCanvasRef as unknown as RefObject<HTMLCanvasElement>,
+        })
       );
       expect(useMouseDrawLine).toHaveBeenCalledWith({
         canvasRef: mockCanvasRef,
@@ -184,27 +184,28 @@ describe("useCanvas", () => {
 
       const { drawImage } = result.current;
 
-      const mockImageInstance = {
+      const mockImageInstance = jest.mocked({
         width: 100,
         height: 100,
-      } as unknown as HTMLImageElement & { onload: () => void };
+        onload: jest.fn(),
+        src: "",
+      });
 
-      global.Image = function () {
-        return mockImageInstance;
-      } as unknown as typeof Image;
+      global.Image = jest.fn().mockImplementation(() => mockImageInstance);
 
-      const mockFileReaderInstance = {
+      const mockFileReaderInstance = jest.mocked({
         readAsDataURL: jest.fn(),
-      } as unknown as FileReader & {
-        onload: (event: ProgressEvent<FileReader>) => void;
-      };
+        onload: jest.fn(),
+      });
 
-      global.FileReader = function () {
-        return mockFileReaderInstance;
-      } as unknown as typeof FileReader;
+      global.FileReader = jest
+        .fn()
+        .mockImplementation(
+          () => mockFileReaderInstance
+        ) as unknown as typeof FileReader;
 
       drawImage(validImageFile);
-      expect(mockGetContext).toHaveBeenCalledWith("2d");
+      expect(mockCanvasRef.current.getContext).toHaveBeenCalledWith("2d");
       expect(mockFileReaderInstance.readAsDataURL).toHaveBeenCalledWith(
         validImageFile
       );
@@ -213,7 +214,7 @@ describe("useCanvas", () => {
 
       expect(mockCanvasRef.current?.width).toBe(mockImageInstance.width);
       expect(mockCanvasRef.current?.height).toBe(mockImageInstance.height);
-      expect(mockDrawImage).toHaveBeenCalledWith(
+      expect(mockedDrawImage).toHaveBeenCalledWith(
         mockImageInstance,
         0,
         0,
