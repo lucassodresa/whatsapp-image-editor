@@ -2,6 +2,14 @@ import "@testing-library/jest-dom";
 import { VALID_IMAGE_TYPES, useCanvas } from ".";
 import { renderHook } from "@testing-library/react";
 import { RefObject } from "react";
+import { useMouseDrawLine } from "./hooks";
+
+useMouseDrawLine as jest.Mock;
+
+jest.mock("./hooks", () => ({
+  ...jest.requireActual("./hooks"),
+  useMouseDrawLine: jest.fn(),
+}));
 
 describe("useCanvas", () => {
   describe("generateDownloadCanvasByImageType", () => {
@@ -14,6 +22,9 @@ describe("useCanvas", () => {
       const { result } = renderHook(() =>
         useCanvas({ canvasRef: mockCanvasRef })
       );
+      expect(useMouseDrawLine).toHaveBeenCalledWith({
+        canvasRef: mockCanvasRef,
+      });
 
       global.console.error = jest.fn();
       const { generateDownloadCanvasByImageType } = result.current;
@@ -34,6 +45,9 @@ describe("useCanvas", () => {
       const { result } = renderHook(() =>
         useCanvas({ canvasRef: mockCanvasRef })
       );
+      expect(useMouseDrawLine).toHaveBeenCalledWith({
+        canvasRef: mockCanvasRef,
+      });
 
       global.console.error = jest.fn();
       const { generateDownloadCanvasByImageType } = result.current;
@@ -56,6 +70,11 @@ describe("useCanvas", () => {
       const { result } = renderHook(() =>
         useCanvas({ canvasRef: mockCanvasRef })
       );
+
+      expect(useMouseDrawLine).toHaveBeenCalledWith({
+        canvasRef: mockCanvasRef,
+      });
+
       const { generateDownloadCanvasByImageType } = result.current;
 
       const mockAnchorElement = {
@@ -91,6 +110,9 @@ describe("useCanvas", () => {
       const { result } = renderHook(() =>
         useCanvas({ canvasRef: invalidCanvasRef })
       );
+      expect(useMouseDrawLine).toHaveBeenCalledWith({
+        canvasRef: invalidCanvasRef,
+      });
 
       global.console.error = jest.fn();
       const { drawImage } = result.current;
@@ -109,6 +131,9 @@ describe("useCanvas", () => {
       const { result } = renderHook(() =>
         useCanvas({ canvasRef: invalidCanvasRef })
       );
+      expect(useMouseDrawLine).toHaveBeenCalledWith({
+        canvasRef: invalidCanvasRef,
+      });
 
       global.console.error = jest.fn();
       const { drawImage } = result.current;
@@ -128,6 +153,10 @@ describe("useCanvas", () => {
       const { result } = renderHook(() =>
         useCanvas({ canvasRef: mockCanvasRefWithInvalidGetContext })
       );
+
+      expect(useMouseDrawLine).toHaveBeenCalledWith({
+        canvasRef: mockCanvasRefWithInvalidGetContext,
+      });
 
       global.console.error = jest.fn();
       const { drawImage } = result.current;
@@ -149,6 +178,10 @@ describe("useCanvas", () => {
       const { result } = renderHook(() =>
         useCanvas({ canvasRef: mockCanvasRef })
       );
+      expect(useMouseDrawLine).toHaveBeenCalledWith({
+        canvasRef: mockCanvasRef,
+      });
+
       const { drawImage } = result.current;
 
       const mockImageInstance = {
@@ -194,42 +227,5 @@ describe("useCanvas", () => {
 
       expect(mockImageInstance.src).toBe("some-url");
     });
-  });
-
-  describe("drawLineWithMouse", () => {
-    it("should throw an error if canvas does not exists", () => {
-      const invalidCanvasRef =
-        undefined as unknown as RefObject<HTMLCanvasElement>;
-
-      const { result } = renderHook(() =>
-        useCanvas({ canvasRef: invalidCanvasRef })
-      );
-
-      global.console.error = jest.fn();
-      const { drawLineWithMouse } = result.current;
-      drawLineWithMouse();
-
-      expect(global.console.error).toHaveBeenCalledWith(
-        "Canvas does not exists"
-      );
-    });
-  });
-
-  it("should throw an error if canvas context does not exists", () => {
-    const mockCanvasRefWithInvalidGetContext = {
-      current: {} as unknown,
-    } as RefObject<HTMLCanvasElement>;
-
-    const { result } = renderHook(() =>
-      useCanvas({ canvasRef: mockCanvasRefWithInvalidGetContext })
-    );
-
-    global.console.error = jest.fn();
-    const { drawLineWithMouse } = result.current;
-    drawLineWithMouse();
-
-    expect(global.console.error).toHaveBeenCalledWith(
-      "Canvas context does not exists"
-    );
   });
 });
