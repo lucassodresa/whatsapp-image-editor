@@ -8,6 +8,8 @@ export const useMouseDrawLine = ({
 }) => {
   const lastAxisCordinatesRef = useRef<number[]>([]);
 
+  const resetLastAxisCordinates = () => (lastAxisCordinatesRef.current = []);
+
   useEffect(() => {
     const canvas = canvasRef?.current;
     if (!canvas) {
@@ -51,23 +53,16 @@ export const useMouseDrawLine = ({
       lastAxisCordinatesRef.current = [offsetX, offsetY];
     };
 
-    const handleMouseUp = () => {
-      lastAxisCordinatesRef.current = [];
-    };
-    const handleMouseOut = () => {
-      lastAxisCordinatesRef.current = [];
-    };
-
     canvas.addEventListener("mousedown", handleMouseDown);
     canvas.addEventListener("mousemove", handleMouseMove);
-    canvas.addEventListener("mouseup", handleMouseUp);
-    canvas.addEventListener("mouseout", handleMouseOut);
+    canvas.addEventListener("mouseup", resetLastAxisCordinates);
+    canvas.addEventListener("mouseout", resetLastAxisCordinates);
 
-    () => {
+    return () => {
       canvas.removeEventListener("mousedown", handleMouseDown);
       canvas.removeEventListener("mousemove", handleMouseMove);
-      canvas.removeEventListener("mouseup", handleMouseUp);
-      canvas.removeEventListener("mouseout", handleMouseOut);
+      canvas.removeEventListener("mouseup", resetLastAxisCordinates);
+      canvas.removeEventListener("mouseout", resetLastAxisCordinates);
     };
   }, [canvasRef]);
 };
