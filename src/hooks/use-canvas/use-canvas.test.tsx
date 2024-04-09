@@ -4,8 +4,6 @@ import { renderHook } from "@testing-library/react";
 import { RefObject } from "react";
 import { useMouseDrawLine } from "./hooks";
 
-useMouseDrawLine as jest.Mock;
-
 jest.mock("./hooks", () => ({
   ...jest.requireActual("./hooks"),
   useMouseDrawLine: jest.fn(),
