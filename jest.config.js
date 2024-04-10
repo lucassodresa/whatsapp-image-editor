@@ -4,7 +4,7 @@ export default {
   testEnvironment: "jsdom",
   coverageDirectory: "coverage",
   coverageProvider: "v8",
-  converageReporters: ["json", "text", "lcov", "clover"],
+  coverageReporters: ["json", "text", "lcov", "clover"],
   collectCoverageFrom: ["src/**/*.{ts,tsx}", "!src/**/*.d.ts"],
   coverageThreshold: {
     global: {
