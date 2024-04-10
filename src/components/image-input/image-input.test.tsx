@@ -41,4 +41,15 @@ describe("ImageInput", () => {
     expect(imageInput).toBeInTheDocument();
     expect(imageInput).not.toHaveClass("hidden");
   });
+
+  it("should not load a file if no file is selected", async () => {
+    const { queryByTestId } = render(<ImageInput />);
+
+    const imageInput = queryByTestId("image-input") as HTMLInputElement;
+    fireEvent.change(imageInput, { target: { files: [] } });
+
+    expect(imageInput.files).toEqual([]);
+    expect(imageInput).toBeInTheDocument();
+    expect(imageInput).not.toHaveClass("hidden");
+  });
 });
