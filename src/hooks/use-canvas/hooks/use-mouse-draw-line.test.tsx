@@ -60,8 +60,8 @@ describe("useMouseDrawLine", () => {
     const mockAddEventListener = getMockAddEventListener(canvas);
     const mockRemoveEventListener = getMockRemoveEventListener(canvas);
 
-    const mockLAstAxisCordinatesRef = { current: [] };
-    jest.spyOn(React, "useRef").mockReturnValue(mockLAstAxisCordinatesRef);
+    const mockLastAxisCordinatesRef = { current: [] };
+    jest.spyOn(React, "useRef").mockReturnValue(mockLastAxisCordinatesRef);
 
     const { unmount } = renderHook(() =>
       useMouseDrawLine({
@@ -76,7 +76,7 @@ describe("useMouseDrawLine", () => {
       "mousedown",
       handleMouseDown
     );
-    expect(mockLAstAxisCordinatesRef.current).toEqual([10, 10]);
+    expect(mockLastAxisCordinatesRef.current).toEqual([10, 10]);
 
     unmount();
 
@@ -95,8 +95,8 @@ describe("useMouseDrawLine", () => {
     const mockAddEventListener = getMockAddEventListener(canvas);
     const mockRemoveEventListener = getMockRemoveEventListener(canvas);
 
-    const mockLAstAxisCordinatesRef = { current: [10, 10] };
-    jest.spyOn(React, "useRef").mockReturnValue(mockLAstAxisCordinatesRef);
+    const mockLastAxisCordinatesRef = { current: [10, 10] };
+    jest.spyOn(React, "useRef").mockReturnValue(mockLastAxisCordinatesRef);
 
     const { unmount } = renderHook(() =>
       useMouseDrawLine({
@@ -107,7 +107,7 @@ describe("useMouseDrawLine", () => {
     handleMouseUp({ offsetX: 10, offsetY: 10 } as MouseEvent);
 
     expect(mockAddEventListener).toHaveBeenCalledWith("mouseup", handleMouseUp);
-    expect(mockLAstAxisCordinatesRef.current.length).toBe(0);
+    expect(mockLastAxisCordinatesRef.current.length).toBe(0);
 
     unmount();
 
@@ -126,8 +126,8 @@ describe("useMouseDrawLine", () => {
     const mockAddEventListener = getMockAddEventListener(canvas);
     const mockRemoveEventListener = getMockRemoveEventListener(canvas);
 
-    const mockLAstAxisCordinatesRef = { current: [10, 10] };
-    jest.spyOn(React, "useRef").mockReturnValue(mockLAstAxisCordinatesRef);
+    const mockLastAxisCordinatesRef = { current: [10, 10] };
+    jest.spyOn(React, "useRef").mockReturnValue(mockLastAxisCordinatesRef);
 
     const { unmount } = renderHook(() =>
       useMouseDrawLine({
@@ -141,7 +141,7 @@ describe("useMouseDrawLine", () => {
       "mouseout",
       handleMouseout
     );
-    expect(mockLAstAxisCordinatesRef.current.length).toBe(0);
+    expect(mockLastAxisCordinatesRef.current.length).toBe(0);
 
     unmount();
 
@@ -170,8 +170,8 @@ describe("useMouseDrawLine", () => {
     const mockAddEventListener = getMockAddEventListener(canvas);
     const mockRemoveEventListener = getMockRemoveEventListener(canvas);
 
-    const mockLAstAxisCordinatesRef = { current: [] };
-    jest.spyOn(React, "useRef").mockReturnValue(mockLAstAxisCordinatesRef);
+    const mockLastAxisCordinatesRef = { current: [] };
+    jest.spyOn(React, "useRef").mockReturnValue(mockLastAxisCordinatesRef);
 
     const { unmount } = renderHook(() =>
       useMouseDrawLine({
@@ -204,8 +204,7 @@ describe("useMouseDrawLine", () => {
     );
   });
 
-  it("should not draw a line if mouse is not down", () => {
-    const canvas = document.createElement("canvas");
+  it("should draw a line if when move if mouse is down", () => {
     const mockContext = jest.mocked({
       beginPath: jest.fn(),
       moveTo: jest.fn(),
@@ -216,43 +215,57 @@ describe("useMouseDrawLine", () => {
       lineCap: undefined,
       strokeStyle: undefined,
     });
-    canvas.getContext = jest.fn().mockReturnValue(mockContext);
+    const mockCanvas = jest.mocked({
+      width: 100,
+      height: 100,
+      offsetWidth: 50,
+      offsetHeight: 50,
+      getContext: jest.fn().mockReturnValue(mockContext),
+      addEventListener: jest.fn().mockImplementation((type, listener) => {
+        eventListeners[type] = listener;
+      }),
+      removeEventListener: jest.fn().mockImplementation((type, listener) => {
+        eventListeners[type] = listener;
+      }),
+    });
 
-    const validCanvasRef = { current: canvas };
+    const validCanvasRef = { current: mockCanvas };
 
-    const mockAddEventListener = getMockAddEventListener(canvas);
-    const mockRemoveEventListener = getMockRemoveEventListener(canvas);
-
-    const mockLAstAxisCordinatesRef = { current: [] };
-    jest.spyOn(React, "useRef").mockReturnValue(mockLAstAxisCordinatesRef);
+    const mockLastAxisCordinatesRef = { current: [] };
+    jest.spyOn(React, "useRef").mockReturnValue(mockLastAxisCordinatesRef);
 
     const { unmount } = renderHook(() =>
       useMouseDrawLine({
-        canvasRef: validCanvasRef,
+        canvasRef: validCanvasRef as unknown as RefObject<HTMLCanvasElement>,
       })
     );
 
     const handleMouseMove = eventListeners["mousemove"] as EventListener;
-    handleMouseMove({ offsetX: 20, offsetY: 20 } as MouseEvent);
+    const handleMouseDown = eventListeners["mousedown"] as EventListener;
 
-    expect(mockAddEventListener).toHaveBeenCalledWith(
+    handleMouseDown({ offsetX: 10, offsetY: 10 } as MouseEvent);
+    handleMouseMove({ offsetX: 11, offsetY: 11 } as MouseEvent);
+
+    expect(mockCanvas.addEventListener).toHaveBeenCalledWith(
       "mousemove",
       handleMouseMove
     );
 
-    expect(mockContext.beginPath).not.toHaveBeenCalled();
-    expect(mockContext.moveTo).not.toHaveBeenCalled();
-    expect(mockContext.lineTo).not.toHaveBeenCalled();
-    expect(mockContext.stroke).not.toHaveBeenCalled();
+    expect(mockContext.beginPath).toHaveBeenCalled();
+    expect(mockContext.moveTo).toHaveBeenCalledWith(20, 20);
+    expect(mockContext.lineTo).toHaveBeenCalledWith(22, 22);
+    expect(mockContext.stroke).toHaveBeenCalled();
 
-    expect(mockContext.lineWidth).toBeUndefined();
-    expect(mockContext.lineJoin).toBeUndefined();
-    expect(mockContext.lineCap).toBeUndefined();
-    expect(mockContext.strokeStyle).toBeUndefined();
+    expect(mockContext.lineWidth).toBe(10);
+    expect(mockContext.lineJoin).toBe("round");
+    expect(mockContext.lineCap).toBe("round");
+    expect(mockContext.strokeStyle).toBe("red");
+
+    expect(mockLastAxisCordinatesRef.current).toEqual([11, 11]);
 
     unmount();
 
-    expect(mockRemoveEventListener).toHaveBeenCalledWith(
+    expect(mockCanvas.removeEventListener).toHaveBeenCalledWith(
       "mousemove",
       handleMouseMove
     );
