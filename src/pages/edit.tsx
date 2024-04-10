@@ -25,13 +25,13 @@ export const Edit = () => {
   return (
     <main className="w-dvw h-dvh">
       <aside className="flex justify-between p-4 w-full mx-auto">
-        <button className="btn btn-square" onClick={handleClear}>
+        <button className="btn btn-square btn-error" onClick={handleClear}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
-            stroke="currentColor"
+            stroke="white"
             className="w-6 h-6"
           >
             <path
@@ -43,7 +43,10 @@ export const Edit = () => {
         </button>
         <ul>
           <li>
-            <button className="btn btn-square" onClick={() => {}}>
+            <button
+              className="btn btn-square btn-outline btn-primary"
+              onClick={() => {}}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -63,7 +66,7 @@ export const Edit = () => {
         </ul>
 
         <a
-          className="btn btn-square"
+          className="btn btn-square btn-primary"
           onClick={generateDownloadCanvasByImageType("png")}
         >
           <svg
