@@ -28,7 +28,8 @@ export const useCanvas = ({
 
       const anchorElement = document.createElement("a");
       anchorElement.href = url;
-      anchorElement.download = imageFile?.name || `image.${imageType}`;
+      anchorElement.download =
+        `${imageFile?.name}.${imageType}` || `image.${imageType}`;
       anchorElement.click();
       anchorElement.remove();
     },

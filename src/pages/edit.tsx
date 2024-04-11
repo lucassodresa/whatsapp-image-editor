@@ -1,14 +1,16 @@
 import { useEffect, useRef } from "react";
 import { Canvas } from "../components/canvas";
 import { useAtom } from "jotai";
-import { imageFileAtom } from "../atoms";
+import { imageFileAtom, drawOptionsAtom, ImageFile } from "../atoms";
 import { VALID_IMAGE_TYPES, useCanvas } from "../hooks/use-canvas";
 import { useNavigate } from "react-router-dom";
+import clsx from "clsx";
 
 export const Edit = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const navigate = useNavigate();
   const [imageFile, setImageFile] = useAtom(imageFileAtom);
+  const [drawOptions, setDrawOptions] = useAtom(drawOptionsAtom);
 
   const { drawImage, generateDownloadCanvasByImageType } = useCanvas({
     canvasRef,
@@ -17,7 +19,7 @@ export const Edit = () => {
   useEffect(() => {
     if (!imageFile) return navigate("/");
 
-    drawImage(imageFile);
+    drawImage(imageFile.source);
   }, [imageFile, navigate, drawImage]);
 
   const handleClear = () => setImageFile(null);
@@ -44,8 +46,16 @@ export const Edit = () => {
         <ul>
           <li>
             <button
-              className="btn btn-square btn-outline btn-primary"
-              onClick={() => {}}
+              className={clsx(
+                "btn btn-square btn-outline btn-primary",
+                drawOptions.isDrawing && "btn-active"
+              )}
+              onClick={() =>
+                setDrawOptions((prevState) => ({
+                  ...prevState,
+                  isDrawing: !prevState.isDrawing,
+                }))
+              }
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -68,75 +78,92 @@ export const Edit = () => {
       <Canvas ref={canvasRef} />
 
       <footer className="flex justify-center p-4">
-        <div className="join">
-          <label className="input input-bordered flex items-center gap-2 join-item">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="w-5 h-5"
-            >
-              <path d="M3 3.5A1.5 1.5 0 0 1 4.5 2h6.879a1.5 1.5 0 0 1 1.06.44l4.122 4.12A1.5 1.5 0 0 1 17 7.622V16.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 3 16.5v-13Z" />
-            </svg>
-
-            <input
-              type="text"
-              className="grow"
-              placeholder="Filename"
-              value={imageFile?.name || ""}
-            />
-          </label>
-          <div className="dropdown dropdown-top dropdown-end ">
-            <button
-              tabIndex={0}
-              role="button"
-              className="btn btn-primary join-item"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
-                />
-              </svg>
-              Download{" "}
+        {drawOptions.isDrawing ? (
+          <div>
+            {/* draw options */}
+            draw options
+          </div>
+        ) : (
+          <div className="join">
+            {/* download image button */}
+            <label className="input input-bordered flex items-center gap-2 join-item">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
                 fill="currentColor"
                 className="w-5 h-5"
               >
-                <path
-                  fillRule="evenodd"
-                  d="M9.47 6.47a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 1 1-1.06 1.06L10 8.06l-3.72 3.72a.75.75 0 0 1-1.06-1.06l4.25-4.25Z"
-                  clipRule="evenodd"
-                />
+                <path d="M3 3.5A1.5 1.5 0 0 1 4.5 2h6.879a1.5 1.5 0 0 1 1.06.44l4.122 4.12A1.5 1.5 0 0 1 17 7.622V16.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 3 16.5v-13Z" />
               </svg>
-            </button>
 
-            <ul
-              tabIndex={0}
-              className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-24"
-            >
-              {VALID_IMAGE_TYPES.map((imageType) => (
-                <li key={imageType}>
-                  <button
-                    onClick={generateDownloadCanvasByImageType(imageType)}
-                  >
-                    .{imageType}
-                  </button>
-                </li>
-              ))}
-            </ul>
+              <input
+                type="text"
+                className="grow"
+                placeholder="Filename"
+                value={imageFile?.name || ""}
+                onChange={({ target }) =>
+                  setImageFile(
+                    (prevState) =>
+                      ({
+                        ...prevState,
+                        name: target.value,
+                      } as ImageFile)
+                  )
+                }
+              />
+            </label>
+            <div className="dropdown dropdown-top dropdown-end ">
+              <button
+                tabIndex={0}
+                role="button"
+                className="btn btn-primary join-item"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
+                  />
+                </svg>
+                Download{" "}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  className="w-5 h-5"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M9.47 6.47a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 1 1-1.06 1.06L10 8.06l-3.72 3.72a.75.75 0 0 1-1.06-1.06l4.25-4.25Z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+
+              <ul
+                tabIndex={0}
+                className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-24"
+              >
+                {VALID_IMAGE_TYPES.map((imageType) => (
+                  <li key={imageType}>
+                    <button
+                      onClick={generateDownloadCanvasByImageType(imageType)}
+                    >
+                      .{imageType}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-        </div>
+        )}
       </footer>
     </main>
   );

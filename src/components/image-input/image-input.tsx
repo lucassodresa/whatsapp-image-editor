@@ -18,7 +18,15 @@ export const ImageInput = () => {
       return;
     }
 
-    setImageFile(file);
+    const filenameWithoutExtension = file.name
+      .split(".")
+      .slice(0, -1)
+      .join(".");
+
+    setImageFile({
+      name: filenameWithoutExtension,
+      source: file,
+    });
   };
 
   return (

@@ -1,3 +1,9 @@
 import { atom } from "jotai";
 
-export const imageFileAtom = atom<File | null>(null);
+export type ImageFile = { name: string; source: File };
+
+export const imageFileAtom = atom<ImageFile | null>(null);
+
+export const drawOptionsAtom = atom({
+  isDrawing: false,
+});

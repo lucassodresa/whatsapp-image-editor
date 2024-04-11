@@ -1,4 +1,6 @@
+import { useAtomValue } from "jotai";
 import { RefObject, useEffect, useRef } from "react";
+import { drawOptionsAtom } from "../../../atoms";
 export const VALID_IMAGE_TYPES = ["png", "jpeg", "jpg", "webp"];
 
 export const useMouseDrawLine = ({
@@ -7,10 +9,13 @@ export const useMouseDrawLine = ({
   canvasRef: RefObject<HTMLCanvasElement>;
 }) => {
   const lastAxisCordinatesRef = useRef<number[]>([]);
+  const drawOptions = useAtomValue(drawOptionsAtom);
 
   const resetLastAxisCordinates = () => (lastAxisCordinatesRef.current = []);
 
   useEffect(() => {
+    if (!drawOptions.isDrawing) return;
+
     const canvas = canvasRef?.current;
     if (!canvas) {
       console.error("Canvas does not exists");
@@ -64,5 +69,5 @@ export const useMouseDrawLine = ({
       canvas.removeEventListener("mouseup", resetLastAxisCordinates);
       canvas.removeEventListener("mouseout", resetLastAxisCordinates);
     };
-  }, [canvasRef]);
+  }, [canvasRef, drawOptions.isDrawing]);
 };
