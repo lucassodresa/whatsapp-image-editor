@@ -1,6 +1,8 @@
 import { RefObject, useCallback } from "react";
 import { useMouseDrawLine } from "./hooks";
-export const VALID_IMAGE_TYPES = ["png", "jpeg", "jpg", "webp"];
+import { useAtomValue } from "jotai";
+import { imageFileAtom } from "../../atoms";
+export const VALID_IMAGE_TYPES = ["png", "jpeg", "webp"];
 type ImageType = (typeof VALID_IMAGE_TYPES)[number];
 
 export const useCanvas = ({
@@ -9,6 +11,7 @@ export const useCanvas = ({
   canvasRef: RefObject<HTMLCanvasElement>;
 }) => {
   useMouseDrawLine({ canvasRef });
+  const imageFile = useAtomValue(imageFileAtom);
 
   const generateDownloadCanvasByImageType = useCallback(
     (imageType: ImageType) => () => {
@@ -25,11 +28,11 @@ export const useCanvas = ({
 
       const anchorElement = document.createElement("a");
       anchorElement.href = url;
-      anchorElement.download = "download-this-canvas";
+      anchorElement.download = imageFile?.name || `image.${imageType}`;
       anchorElement.click();
       anchorElement.remove();
     },
-    [canvasRef]
+    [canvasRef, imageFile]
   );
 
   const drawImage = useCallback(

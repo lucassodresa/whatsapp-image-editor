@@ -12,7 +12,7 @@ export const Canvas = forwardRef((_, ref: ForwardedRef<HTMLCanvasElement>) => {
       data-testid="canvas"
       className={clsx(
         !imageFile && "hidden",
-        "max-w-full max-h-[calc(100vh-80px)] mx-auto border-2 rounded-md"
+        "max-w-full max-h-[calc(100vh-160px)] mx-auto border-2 rounded-md"
       )}
     ></canvas>
   );
