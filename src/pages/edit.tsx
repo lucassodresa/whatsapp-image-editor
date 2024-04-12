@@ -6,6 +6,97 @@ import { VALID_IMAGE_TYPES, useCanvas } from "../hooks/use-canvas";
 import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
 
+const COLOR_OPTIONS = [
+  { bgColorName: "bg-neutral-700", bgColorHex: "#434343" },
+  { bgColorName: "bg-zinc-400", bgColorHex: "#9da0a9" },
+  { bgColorName: "bg-white", bgColorHex: "#ffffff" },
+  { bgColorName: "bg-sky-400", bgColorHex: "#38bdf8" },
+  { bgColorName: "bg-lime-500", bgColorHex: "#84cc16" },
+  { bgColorName: "bg-purple-400", bgColorHex: "#c084fc" },
+  { bgColorName: "bg-orange-400", bgColorHex: "#f49226" },
+  { bgColorName: "bg-red-500", bgColorHex: "#ff4a4a" },
+];
+
+const SIZE_OPTIONS = [
+  {
+    size: 5,
+    className: "w-5 h-5",
+  },
+  {
+    size: 10,
+    className: "w-6 h-6",
+  },
+  {
+    size: 15,
+    className: "w-7 h-7",
+  },
+  {
+    size: 20,
+    className: "w-8 h-8",
+  },
+];
+
+const DrawOptions = () => {
+  const [{ lineColor }, setDrawOptions] = useAtom(drawOptionsAtom);
+
+  return (
+    <div className="flex items-center gap-10">
+      <div className="flex items-center justify-center bg-slate-200 p-2 rounded">
+        {COLOR_OPTIONS.map(({ bgColorName, bgColorHex }) => {
+          const isActive = lineColor === bgColorHex;
+
+          return (
+            <button
+              key={bgColorName}
+              className={clsx("w-7 h-7 flex items-center justify-center group")}
+              disabled={isActive}
+              onClick={() =>
+                setDrawOptions((prevState) => ({
+                  ...prevState,
+                  lineColor: bgColorHex,
+                }))
+              }
+            >
+              <span
+                className={clsx(
+                  "w-5 h-5 rounded-full",
+                  bgColorName,
+                  isActive ? "w-6 h-6" : "group-hover:w-6 group-hover:h-6"
+                )}
+              ></span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="flex items-center justify-center gap-2">
+        {SIZE_OPTIONS.map(({ size, className }) => {
+          const isActive = size === 10;
+
+          return (
+            <button
+              key={size}
+              className={clsx(
+                className,
+                "flex items-center justify-center bg-slate-200 rounded-full hover:bg-slate-400",
+                isActive && "bg-slate-600"
+              )}
+              // disabled={isActive}
+              onClick={
+                () => {}
+                // setDrawOptions((prevState) => ({
+                //   ...prevState,
+                //   lineColor: bgColorHex,
+                // }))
+              }
+            ></button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 export const Edit = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const navigate = useNavigate();
@@ -79,10 +170,7 @@ export const Edit = () => {
 
       <footer className="flex justify-center p-4">
         {drawOptions.isDrawing ? (
-          <div>
-            {/* draw options */}
-            draw options
-          </div>
+          <DrawOptions />
         ) : (
           <div className="join">
             {/* download image button */}
@@ -112,7 +200,7 @@ export const Edit = () => {
                 }
               />
             </label>
-            <div className="dropdown dropdown-top dropdown-end ">
+            <div className="dropdown dropdown-top dropdown-end">
               <button
                 tabIndex={0}
                 role="button"

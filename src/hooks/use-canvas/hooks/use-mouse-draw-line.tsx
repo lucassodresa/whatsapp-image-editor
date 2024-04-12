@@ -39,10 +39,10 @@ export const useMouseDrawLine = ({
       if (!isDrawing) return;
 
       context.beginPath();
-      context.lineWidth = 10;
+      context.lineWidth = 20;
       context.lineJoin = "round";
       context.lineCap = "round";
-      context.strokeStyle = "red";
+      context.strokeStyle = drawOptions.lineColor;
 
       const [lastX, lastY] = lastAxisCordinates;
 
@@ -69,5 +69,5 @@ export const useMouseDrawLine = ({
       canvas.removeEventListener("mouseup", resetLastAxisCordinates);
       canvas.removeEventListener("mouseout", resetLastAxisCordinates);
     };
-  }, [canvasRef, drawOptions.isDrawing]);
+  }, [canvasRef, drawOptions.isDrawing, drawOptions.lineColor]);
 };
