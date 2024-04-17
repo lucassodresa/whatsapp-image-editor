@@ -1,10 +1,11 @@
-import { useAtom } from "jotai";
-import { imageFileAtom } from "../../atoms";
+import { useAtom, useSetAtom } from "jotai";
+import { imageFileNameAtom, imageFileSourceAtom } from "../../atoms";
 import { ChangeEvent } from "react";
 import clsx from "clsx";
 
 export const ImageInput = () => {
-  const [imageFile, setImageFile] = useAtom(imageFileAtom);
+  const [imageFileSource, setImageFileSource] = useAtom(imageFileSourceAtom);
+  const setImageFileName = useSetAtom(imageFileNameAtom);
 
   const handleChange = ({ target }: ChangeEvent<HTMLInputElement>) => {
     const file = target.files?.[0];
@@ -23,17 +24,15 @@ export const ImageInput = () => {
       .slice(0, -1)
       .join(".");
 
-    setImageFile({
-      name: filenameWithoutExtension,
-      source: file,
-    });
+    setImageFileName(filenameWithoutExtension);
+    setImageFileSource(file);
   };
 
   return (
     <input
       className={clsx(
         "file-input file-input-bordered file-input-primary w-full max-w-xs",
-        imageFile && "hidden"
+        imageFileSource && "hidden"
       )}
       data-testid="image-input"
       type="file"

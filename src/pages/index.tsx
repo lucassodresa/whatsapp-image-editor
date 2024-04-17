@@ -1,17 +1,17 @@
-import { useAtomValue } from "jotai";
 import { ImageInput } from "../components/image-input";
-import { imageFileAtom } from "../atoms";
-import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+// import { useAtomValue } from "jotai";
+// import { imageFileSourceAtom } from "../atoms";
+// import { useNavigate } from "react-router-dom";
+// import { useEffect } from "react";
 
 export const Home = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
-  const imageFile = useAtomValue(imageFileAtom);
+  // const imageFileSource = useAtomValue(imageFileSourceAtom);
 
-  useEffect(() => {
-    if (imageFile) navigate("/edit");
-  });
+  // useEffect(() => {
+  //   if (imageFileSource) navigate("/edit");
+  // });
 
   return (
     <main className="w-dvw h-dvh flex flex-col items-center justify-evenly">
@@ -19,7 +19,7 @@ export const Home = () => {
         <h1 className="text-4xl font-bold">Image Editor</h1>
         <img
           src="./color-palette.svg"
-          alt="An person palying with color palette"
+          alt="An person playing with color palette"
         />
       </div>
       <ImageInput />

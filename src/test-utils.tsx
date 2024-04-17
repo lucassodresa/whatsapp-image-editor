@@ -1,12 +1,14 @@
+import "@testing-library/jest-dom";
 import { ReactElement, ReactNode } from "react";
 import { render, RenderOptions } from "@testing-library/react";
 import { Provider as JotaiProvider } from "jotai";
 import { useHydrateAtoms } from "jotai/utils";
 import type { WritableAtom } from "jotai/vanilla";
+
 type AnyWritableAtom = WritableAtom<unknown, never[], unknown>;
 export type jotaiInitialValues = [AnyWritableAtom, never][];
 
-const HydrateAtoms = ({
+export const HydrateAtoms = ({
   jotaiInitialValues,
   children,
 }: {

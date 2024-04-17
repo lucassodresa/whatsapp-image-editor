@@ -1,17 +1,23 @@
-import { RefObject, useCallback } from "react";
+import { RefObject, useCallback, useEffect } from "react";
 import { useMouseDrawLine } from "./hooks";
-import { useAtomValue } from "jotai";
-import { imageFileAtom } from "../../atoms";
+import { createStore, useAtomValue } from "jotai";
+import { imageFileNameAtom, imageFileSourceAtom } from "../../atoms";
+import { useNavigate } from "react-router-dom";
 export const VALID_IMAGE_TYPES = ["png", "jpeg", "webp"];
 type ImageType = (typeof VALID_IMAGE_TYPES)[number];
+
+const myStore = createStore();
 
 export const useCanvas = ({
   canvasRef,
 }: {
   canvasRef: RefObject<HTMLCanvasElement>;
 }) => {
+  const imageFileSource = useAtomValue(imageFileSourceAtom);
+  const navigate = useNavigate();
+
   useMouseDrawLine({ canvasRef });
-  const imageFile = useAtomValue(imageFileAtom);
+  const imageFileName = useAtomValue(imageFileNameAtom);
 
   const generateDownloadCanvasByImageType = useCallback(
     (imageType: ImageType) => () => {
@@ -29,11 +35,11 @@ export const useCanvas = ({
       const anchorElement = document.createElement("a");
       anchorElement.href = url;
       anchorElement.download =
-        `${imageFile?.name}.${imageType}` || `image.${imageType}`;
+        `${imageFileName}.${imageType}` || `image.${imageType}`;
       anchorElement.click();
       anchorElement.remove();
     },
-    [canvasRef, imageFile]
+    [canvasRef, imageFileName]
   );
 
   const drawImage = useCallback(
@@ -72,6 +78,12 @@ export const useCanvas = ({
     },
     [canvasRef]
   );
+
+  useEffect(() => {
+    if (!imageFileSource) return navigate("/");
+
+    drawImage(imageFileSource);
+  }, [imageFileSource, navigate, drawImage]);
 
   return {
     generateDownloadCanvasByImageType,

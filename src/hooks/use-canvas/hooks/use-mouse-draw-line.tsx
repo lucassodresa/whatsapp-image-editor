@@ -1,6 +1,6 @@
 import { useAtomValue } from "jotai";
 import { RefObject, useEffect, useRef } from "react";
-import { drawOptionsAtom } from "../../../atoms";
+import { isDrawingAtom, lineColorAtom, lineSizeAtom } from "../../../atoms";
 export const VALID_IMAGE_TYPES = ["png", "jpeg", "jpg", "webp"];
 
 export const useMouseDrawLine = ({
@@ -8,13 +8,16 @@ export const useMouseDrawLine = ({
 }: {
   canvasRef: RefObject<HTMLCanvasElement>;
 }) => {
+  console.log("newCanvas");
   const lastAxisCordinatesRef = useRef<number[]>([]);
-  const drawOptions = useAtomValue(drawOptionsAtom);
+  const isDrawing = useAtomValue(isDrawingAtom);
+  const lineColor = useAtomValue(lineColorAtom);
+  const lineSize = useAtomValue(lineSizeAtom);
 
   const resetLastAxisCordinates = () => (lastAxisCordinatesRef.current = []);
 
   useEffect(() => {
-    if (!drawOptions.isDrawing) return;
+    if (!isDrawing) return;
 
     const canvas = canvasRef?.current;
     if (!canvas) {
@@ -39,10 +42,10 @@ export const useMouseDrawLine = ({
       if (!isDrawing) return;
 
       context.beginPath();
-      context.lineWidth = 20;
+      context.lineWidth = lineSize;
       context.lineJoin = "round";
       context.lineCap = "round";
-      context.strokeStyle = drawOptions.lineColor;
+      context.strokeStyle = lineColor;
 
       const [lastX, lastY] = lastAxisCordinates;
 
@@ -69,5 +72,5 @@ export const useMouseDrawLine = ({
       canvas.removeEventListener("mouseup", resetLastAxisCordinates);
       canvas.removeEventListener("mouseout", resetLastAxisCordinates);
     };
-  }, [canvasRef, drawOptions.isDrawing, drawOptions.lineColor]);
+  }, [canvasRef, isDrawing, lineColor, lineSize]);
 };

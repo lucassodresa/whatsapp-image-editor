@@ -2,9 +2,9 @@ import { atom } from "jotai";
 
 export type ImageFile = { name: string; source: File };
 
-export const imageFileAtom = atom<ImageFile | null>(null);
+export const imageFileSourceAtom = atom<File | null>(null);
+export const imageFileNameAtom = atom("");
 
-export const drawOptionsAtom = atom({
-  isDrawing: false,
-  lineColor: "#84CC16",
-});
+export const isDrawingAtom = atom(false);
+export const lineColorAtom = atom("#84CC16");
+export const lineSizeAtom = atom(10);

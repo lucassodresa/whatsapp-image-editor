@@ -1,9 +1,13 @@
-import { useEffect, useRef } from "react";
+import { RefObject, useRef } from "react";
 import { Canvas } from "../components/canvas";
-import { useAtom } from "jotai";
-import { imageFileAtom, drawOptionsAtom, ImageFile } from "../atoms";
+import { useAtom, useAtomValue } from "jotai";
+import {
+  imageFileNameAtom,
+  isDrawingAtom,
+  lineColorAtom,
+  lineSizeAtom,
+} from "../atoms";
 import { VALID_IMAGE_TYPES, useCanvas } from "../hooks/use-canvas";
-import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
 
 const COLOR_OPTIONS = [
@@ -36,84 +40,155 @@ const SIZE_OPTIONS = [
   },
 ];
 
-const DrawOptions = () => {
-  const [{ lineColor }, setDrawOptions] = useAtom(drawOptionsAtom);
+const DrawOptions = ({
+  canvasRef,
+}: {
+  canvasRef: RefObject<HTMLCanvasElement>;
+}) => {
+  const [lineColor, setLineColor] = useAtom(lineColorAtom);
+  const [lineSize, setLineSize] = useAtom(lineSizeAtom);
+  const [imageFileName, setImageFileName] = useAtom(imageFileNameAtom);
+  const isDrawing = useAtomValue(isDrawingAtom);
+
+  const { generateDownloadCanvasByImageType } = useCanvas({
+    canvasRef,
+  });
 
   return (
-    <div className="flex items-center gap-10">
-      <div className="flex items-center justify-center bg-slate-200 p-2 rounded">
-        {COLOR_OPTIONS.map(({ bgColorName, bgColorHex }) => {
-          const isActive = lineColor === bgColorHex;
+    <footer className="flex justify-center p-4">
+      {isDrawing ? (
+        <div className="flex items-center gap-10">
+          <div className="flex items-center justify-center bg-slate-200 p-2 rounded">
+            {COLOR_OPTIONS.map(({ bgColorName, bgColorHex }) => {
+              const isActive = lineColor === bgColorHex;
 
-          return (
-            <button
-              key={bgColorName}
-              className={clsx("w-7 h-7 flex items-center justify-center group")}
-              disabled={isActive}
-              onClick={() =>
-                setDrawOptions((prevState) => ({
-                  ...prevState,
-                  lineColor: bgColorHex,
-                }))
-              }
+              return (
+                <button
+                  key={bgColorName}
+                  className={clsx(
+                    "w-7 h-7 flex items-center justify-center group"
+                  )}
+                  disabled={isActive}
+                  onClick={() => setLineColor(bgColorHex)}
+                >
+                  <span
+                    className={clsx(
+                      "w-5 h-5 rounded-full",
+                      bgColorName,
+                      isActive ? "w-6 h-6" : "group-hover:w-6 group-hover:h-6"
+                    )}
+                  ></span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="flex items-center justify-center gap-2">
+            {SIZE_OPTIONS.map(({ size, className }) => {
+              const isActive = size === lineSize;
+
+              return (
+                <button
+                  key={size}
+                  className={clsx(
+                    className,
+                    "flex items-center justify-center bg-slate-200 rounded-full",
+                    isActive && "bg-slate-600",
+                    !isActive && "hover:bg-slate-400"
+                  )}
+                  disabled={isActive}
+                  onClick={() => setLineSize(size)}
+                ></button>
+              );
+            })}
+          </div>
+        </div>
+      ) : (
+        <div className="join">
+          {/* download image button */}
+          <label className="input input-bordered flex items-center gap-2 join-item">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="w-5 h-5"
             >
-              <span
-                className={clsx(
-                  "w-5 h-5 rounded-full",
-                  bgColorName,
-                  isActive ? "w-6 h-6" : "group-hover:w-6 group-hover:h-6"
-                )}
-              ></span>
-            </button>
-          );
-        })}
-      </div>
+              <path d="M3 3.5A1.5 1.5 0 0 1 4.5 2h6.879a1.5 1.5 0 0 1 1.06.44l4.122 4.12A1.5 1.5 0 0 1 17 7.622V16.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 3 16.5v-13Z" />
+            </svg>
 
-      <div className="flex items-center justify-center gap-2">
-        {SIZE_OPTIONS.map(({ size, className }) => {
-          const isActive = size === 10;
-
-          return (
+            <input
+              type="text"
+              className="grow"
+              placeholder="Filename"
+              value={imageFileName}
+              onChange={({ target }) => setImageFileName(target.value)}
+            />
+          </label>
+          <div className="dropdown dropdown-top dropdown-end">
             <button
-              key={size}
-              className={clsx(
-                className,
-                "flex items-center justify-center bg-slate-200 rounded-full hover:bg-slate-400",
-                isActive && "bg-slate-600"
-              )}
-              // disabled={isActive}
-              onClick={
-                () => {}
-                // setDrawOptions((prevState) => ({
-                //   ...prevState,
-                //   lineColor: bgColorHex,
-                // }))
-              }
-            ></button>
-          );
-        })}
-      </div>
-    </div>
+              tabIndex={0}
+              role="button"
+              className="btn btn-primary join-item"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
+                />
+              </svg>
+              Download{" "}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="w-5 h-5"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M9.47 6.47a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 1 1-1.06 1.06L10 8.06l-3.72 3.72a.75.75 0 0 1-1.06-1.06l4.25-4.25Z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+
+            <ul
+              tabIndex={0}
+              className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-24"
+            >
+              {VALID_IMAGE_TYPES.map((imageType) => (
+                <li key={imageType}>
+                  <button
+                    onClick={generateDownloadCanvasByImageType(imageType)}
+                  >
+                    .{imageType}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+    </footer>
   );
 };
 
 export const Edit = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const navigate = useNavigate();
-  const [imageFile, setImageFile] = useAtom(imageFileAtom);
-  const [drawOptions, setDrawOptions] = useAtom(drawOptionsAtom);
+  const [imageFileName, setImageFileName] = useAtom(imageFileNameAtom);
+  const [isDrawing, setIsDrawing] = useAtom(isDrawingAtom);
 
-  const { drawImage, generateDownloadCanvasByImageType } = useCanvas({
-    canvasRef,
-  });
-
-  useEffect(() => {
-    if (!imageFile) return navigate("/");
-
-    drawImage(imageFile.source);
-  }, [imageFile, navigate, drawImage]);
-
-  const handleClear = () => setImageFile(null);
+  const handleClear = () => {
+    setImageFileSource(null);
+    setImageFileName("");
+  };
 
   return (
     <main className="w-dvw h-dvh flex flex-col  items-center">
@@ -139,14 +214,9 @@ export const Edit = () => {
             <button
               className={clsx(
                 "btn btn-square btn-outline btn-primary",
-                drawOptions.isDrawing && "btn-active"
+                isDrawing && "btn-active"
               )}
-              onClick={() =>
-                setDrawOptions((prevState) => ({
-                  ...prevState,
-                  isDrawing: !prevState.isDrawing,
-                }))
-              }
+              onClick={() => setIsDrawing((prevIsDrawing) => !prevIsDrawing)}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -168,91 +238,7 @@ export const Edit = () => {
       </aside>
       <Canvas ref={canvasRef} />
 
-      <footer className="flex justify-center p-4">
-        {drawOptions.isDrawing ? (
-          <DrawOptions />
-        ) : (
-          <div className="join">
-            {/* download image button */}
-            <label className="input input-bordered flex items-center gap-2 join-item">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                className="w-5 h-5"
-              >
-                <path d="M3 3.5A1.5 1.5 0 0 1 4.5 2h6.879a1.5 1.5 0 0 1 1.06.44l4.122 4.12A1.5 1.5 0 0 1 17 7.622V16.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 3 16.5v-13Z" />
-              </svg>
-
-              <input
-                type="text"
-                className="grow"
-                placeholder="Filename"
-                value={imageFile?.name || ""}
-                onChange={({ target }) =>
-                  setImageFile(
-                    (prevState) =>
-                      ({
-                        ...prevState,
-                        name: target.value,
-                      } as ImageFile)
-                  )
-                }
-              />
-            </label>
-            <div className="dropdown dropdown-top dropdown-end">
-              <button
-                tabIndex={0}
-                role="button"
-                className="btn btn-primary join-item"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-6 h-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
-                  />
-                </svg>
-                Download{" "}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M9.47 6.47a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 1 1-1.06 1.06L10 8.06l-3.72 3.72a.75.75 0 0 1-1.06-1.06l4.25-4.25Z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
-
-              <ul
-                tabIndex={0}
-                className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-24"
-              >
-                {VALID_IMAGE_TYPES.map((imageType) => (
-                  <li key={imageType}>
-                    <button
-                      onClick={generateDownloadCanvasByImageType(imageType)}
-                    >
-                      .{imageType}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        )}
-      </footer>
+      <DrawOptions canvasRef={canvasRef} />
     </main>
   );
 };
