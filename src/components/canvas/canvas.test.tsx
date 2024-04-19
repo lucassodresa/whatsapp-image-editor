@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
 import { Canvas } from ".";
 import { imageFileAtom } from "../../atoms";
-import { render } from "../../test-utils";
+import { render } from "../../jest-utils";
 
 describe("Canvas", () => {
   it("should renders if image file is loaded", () => {

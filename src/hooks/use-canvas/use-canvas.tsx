@@ -1,12 +1,10 @@
 import { RefObject, useCallback, useEffect } from "react";
 import { useMouseDrawLine } from "./hooks";
-import { createStore, useAtomValue } from "jotai";
+import { useAtomValue } from "jotai";
 import { imageFileNameAtom, imageFileSourceAtom } from "../../atoms";
 import { useNavigate } from "react-router-dom";
 export const VALID_IMAGE_TYPES = ["png", "jpeg", "webp"];
 type ImageType = (typeof VALID_IMAGE_TYPES)[number];
-
-const myStore = createStore();
 
 export const useCanvas = ({
   canvasRef,

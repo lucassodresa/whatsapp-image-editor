@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 import { ImageInput } from ".";
-import { fireEvent, render } from "../../test-utils";
+import { fireEvent, render } from "../../jest-utils";
 
 describe("ImageInput", () => {
   it("should renders correctly an input tag that only accepts image file types", () => {

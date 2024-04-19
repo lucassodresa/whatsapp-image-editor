@@ -8,7 +8,6 @@ export const useMouseDrawLine = ({
 }: {
   canvasRef: RefObject<HTMLCanvasElement>;
 }) => {
-  console.log("newCanvas");
   const lastAxisCordinatesRef = useRef<number[]>([]);
   const isDrawing = useAtomValue(isDrawingAtom);
   const lineColor = useAtomValue(lineColorAtom);

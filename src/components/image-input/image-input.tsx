@@ -1,11 +1,12 @@
-import { useAtom, useSetAtom } from "jotai";
+import { useSetAtom } from "jotai";
 import { imageFileNameAtom, imageFileSourceAtom } from "../../atoms";
 import { ChangeEvent } from "react";
-import clsx from "clsx";
+import { useNavigate } from "react-router-dom";
 
 export const ImageInput = () => {
-  const [imageFileSource, setImageFileSource] = useAtom(imageFileSourceAtom);
+  const setImageFileSource = useSetAtom(imageFileSourceAtom);
   const setImageFileName = useSetAtom(imageFileNameAtom);
+  const navigate = useNavigate();
 
   const handleChange = ({ target }: ChangeEvent<HTMLInputElement>) => {
     const file = target.files?.[0];
@@ -26,15 +27,13 @@ export const ImageInput = () => {
 
     setImageFileName(filenameWithoutExtension);
     setImageFileSource(file);
+    navigate("/edit");
   };
 
   return (
     <input
-      className={clsx(
-        "file-input file-input-bordered file-input-primary w-full max-w-xs",
-        imageFileSource && "hidden"
-      )}
-      data-testid="image-input"
+      role="button"
+      className="file-input file-input-bordered file-input-primary w-full max-w-xs"
       type="file"
       accept="image/*"
       onChange={handleChange}
