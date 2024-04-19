@@ -1,5 +1,6 @@
 import { createMemoryRouter } from "react-router-dom";
-import { fireEvent, renderWithRouter } from "../jest-utils";
+// import { fireEvent, renderWithRouter } from "../utils/test";
+import { fireEvent, renderWithRouter } from "@/utils/test";
 import { PAGES, routes } from "../routes";
 
 import { describe, it, expect } from "vitest";

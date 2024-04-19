@@ -245,7 +245,6 @@ export const Edit = () => {
       <Canvas ref={canvasRef} />
 
       <div className="join">
-        {/* download image button */}
         <label className="input input-bordered flex items-center gap-2 join-item">
           <svg
             xmlns="http:www.w3.org/2000/svg"
