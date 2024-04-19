@@ -9,14 +9,18 @@ export const ImageInput = () => {
   const navigate = useNavigate();
 
   const handleChange = ({ target }: ChangeEvent<HTMLInputElement>) => {
-    const file = target.files?.[0];
+    const resetInputFile = () => (target.files = null);
 
-    if (!file) return;
+    const file = target.files?.[0];
+    const isFile = file instanceof File;
+    if (!isFile) {
+      resetInputFile();
+      return;
+    }
 
     const isImageType = file.type.startsWith("image/");
     if (!isImageType) {
-      target.value = "";
-      target.files = null;
+      resetInputFile();
       return;
     }
 
