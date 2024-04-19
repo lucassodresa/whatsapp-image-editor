@@ -20,7 +20,11 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
-
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+    }
   },
   
   "include": ["src"],
