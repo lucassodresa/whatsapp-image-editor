@@ -4,9 +4,18 @@ import { Provider as JotaiProvider } from "jotai";
 import { useHydrateAtoms } from "jotai/utils";
 import type { WritableAtom } from "jotai/vanilla";
 import { RouterProvider, createMemoryRouter } from "react-router-dom";
+import { routes } from "@/routes";
 
 type AnyWritableAtom = WritableAtom<unknown, never[], unknown>;
 export type jotaiInitialValues = [AnyWritableAtom, never][];
+
+export type InitialEntry = string | Partial<Location>;
+
+type RouterOptions = {
+  basename?: string;
+  initialEntries?: InitialEntry[];
+  initialIndex?: number;
+};
 
 export const HydrateAtoms = ({
   jotaiInitialValues,
@@ -38,17 +47,25 @@ const TestProvider = ({
   );
 };
 
-const customRenderRoute = (options: {
+const customRenderRoute = ({
+  routerOptions,
+  jotaiInitialValues,
+}: {
   jotaiInitialValues?: jotaiInitialValues;
-  router: ReturnType<typeof createMemoryRouter>;
-}) =>
-  render(
-    <TestProvider
-      jotaiInitialValues={options?.jotaiInitialValues || []}
-      router={options.router}
-    />
-  );
+  routerOptions: RouterOptions;
+}) => {
+  const router = createMemoryRouter(routes, { ...routerOptions });
 
-// eslint-disable-next-line react-refresh/only-export-components
+  return {
+    ...render(
+      <TestProvider
+        jotaiInitialValues={jotaiInitialValues ?? []}
+        router={router}
+      />
+    ),
+    router,
+  };
+};
+
 export * from "@testing-library/react";
 export { customRenderRoute as renderWithRouter };

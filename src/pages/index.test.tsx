@@ -1,29 +1,26 @@
-import { createMemoryRouter } from "react-router-dom";
-// import { fireEvent, renderWithRouter } from "../utils/test";
 import { fireEvent, renderWithRouter } from "@/utils/test";
-import { PAGES, routes } from "../routes";
-
+import { PAGES } from "../routes";
 import { describe, it, expect } from "vitest";
+
+const DEFAULT_ROUTER_OPTIONS = {
+  initialEntries: [PAGES.HOME.path],
+};
 
 describe("Home page", () => {
   describe("Title", () => {
     it("should be a <h1> tag", () => {
-      const router = createMemoryRouter(routes, {
-        initialEntries: [PAGES.HOME.path],
+      const { getByRole } = renderWithRouter({
+        routerOptions: DEFAULT_ROUTER_OPTIONS,
       });
-
-      const { getByRole } = renderWithRouter({ router });
 
       const heading = getByRole("heading", { level: 1 });
       expect(heading).toBeInTheDocument();
     });
 
     it("should have a correct text", () => {
-      const router = createMemoryRouter(routes, {
-        initialEntries: [PAGES.HOME.path],
+      const { getByRole } = renderWithRouter({
+        routerOptions: DEFAULT_ROUTER_OPTIONS,
       });
-
-      const { getByRole } = renderWithRouter({ router });
 
       const heading = getByRole("heading", { level: 1 });
       expect(heading).toHaveTextContent("Image Editor");
@@ -32,22 +29,18 @@ describe("Home page", () => {
 
   describe("Hero Image", () => {
     it("should be an <image> tag", () => {
-      const router = createMemoryRouter(routes, {
-        initialEntries: [PAGES.HOME.path],
+      const { getByRole } = renderWithRouter({
+        routerOptions: DEFAULT_ROUTER_OPTIONS,
       });
-
-      const { getByRole } = renderWithRouter({ router });
 
       const image = getByRole("img");
       expect(image).toBeInTheDocument();
     });
 
     it("should have a correct alt text", () => {
-      const router = createMemoryRouter(routes, {
-        initialEntries: [PAGES.HOME.path],
+      const { getByRole } = renderWithRouter({
+        routerOptions: DEFAULT_ROUTER_OPTIONS,
       });
-
-      const { getByRole } = renderWithRouter({ router });
 
       const image = getByRole("img");
       expect(image).toHaveAttribute(
@@ -57,11 +50,9 @@ describe("Home page", () => {
     });
 
     it("should have a correct source", () => {
-      const router = createMemoryRouter(routes, {
-        initialEntries: [PAGES.HOME.path],
+      const { getByRole } = renderWithRouter({
+        routerOptions: DEFAULT_ROUTER_OPTIONS,
       });
-
-      const { getByRole } = renderWithRouter({ router });
 
       const image = getByRole("img");
       expect(image).toHaveAttribute("src", "color-palette.svg");
@@ -70,11 +61,9 @@ describe("Home page", () => {
 
   describe("Image input", () => {
     it("should be an <input> tag", () => {
-      const router = createMemoryRouter(routes, {
-        initialEntries: [PAGES.HOME.path],
+      const { getByRole } = renderWithRouter({
+        routerOptions: DEFAULT_ROUTER_OPTIONS,
       });
-
-      const { getByRole } = renderWithRouter({ router });
 
       const imageInput = getByRole("button");
 
@@ -83,22 +72,18 @@ describe("Home page", () => {
     });
 
     it("should be a file input", () => {
-      const router = createMemoryRouter(routes, {
-        initialEntries: [PAGES.HOME.path],
+      const { getByRole } = renderWithRouter({
+        routerOptions: DEFAULT_ROUTER_OPTIONS,
       });
-
-      const { getByRole } = renderWithRouter({ router });
 
       const imageInput = getByRole("button");
       expect(imageInput).toHaveAttribute("type", "file");
     });
 
     it("should accept only image files", () => {
-      const router = createMemoryRouter(routes, {
-        initialEntries: [PAGES.HOME.path],
+      const { getByRole } = renderWithRouter({
+        routerOptions: DEFAULT_ROUTER_OPTIONS,
       });
-
-      const { getByRole } = renderWithRouter({ router });
 
       const imageInput = getByRole("button");
       expect(imageInput).toHaveAttribute("accept", "image/*");
@@ -109,11 +94,10 @@ describe("Home page", () => {
         const validFile = new File(["some-image-content"], "text.txt", {
           type: "text/plain",
         });
-        const router = createMemoryRouter(routes, {
-          initialEntries: [PAGES.HOME.path],
-        });
 
-        const { getByRole } = renderWithRouter({ router });
+        const { getByRole, router } = renderWithRouter({
+          routerOptions: DEFAULT_ROUTER_OPTIONS,
+        });
 
         const imageInput = getByRole("button");
         fireEvent.change(imageInput, { target: { files: [validFile] } });
@@ -123,11 +107,10 @@ describe("Home page", () => {
 
       it("should clear the file input files if is not a file", () => {
         const invalidFile = null;
-        const router = createMemoryRouter(routes, {
-          initialEntries: [PAGES.HOME.path],
-        });
 
-        const { getByRole } = renderWithRouter({ router });
+        const { getByRole } = renderWithRouter({
+          routerOptions: DEFAULT_ROUTER_OPTIONS,
+        });
 
         const imageInput = getByRole("button") as HTMLInputElement;
         fireEvent.change(imageInput, { target: { files: [invalidFile] } });
@@ -139,11 +122,10 @@ describe("Home page", () => {
         const validFile = new File(["some-image-content"], "text.txt", {
           type: "text/plain",
         });
-        const router = createMemoryRouter(routes, {
-          initialEntries: [PAGES.HOME.path],
-        });
 
-        const { getByRole } = renderWithRouter({ router });
+        const { getByRole } = renderWithRouter({
+          routerOptions: DEFAULT_ROUTER_OPTIONS,
+        });
 
         const imageInput = getByRole("button") as HTMLInputElement;
         fireEvent.change(imageInput, { target: { files: [validFile] } });
@@ -157,11 +139,10 @@ describe("Home page", () => {
         const validFile = new File(["some-image-content"], "image.png", {
           type: "image/png",
         });
-        const router = createMemoryRouter(routes, {
-          initialEntries: [PAGES.HOME.path],
-        });
 
-        const { getByRole } = renderWithRouter({ router });
+        const { getByRole, router } = renderWithRouter({
+          routerOptions: DEFAULT_ROUTER_OPTIONS,
+        });
 
         const imageInput = getByRole("button");
         fireEvent.change(imageInput, { target: { files: [validFile] } });
@@ -174,11 +155,10 @@ describe("Home page", () => {
           const validFile = new File(["some-image-content"], "image.png", {
             type: "image/png",
           });
-          const router = createMemoryRouter(routes, {
-            initialEntries: [PAGES.HOME.path],
-          });
 
-          const { getByRole, getByTestId } = renderWithRouter({ router });
+          const { getByRole, getByTestId } = renderWithRouter({
+            routerOptions: DEFAULT_ROUTER_OPTIONS,
+          });
 
           const imageInput = getByRole("button");
           fireEvent.change(imageInput, { target: { files: [validFile] } });
@@ -190,12 +170,9 @@ describe("Home page", () => {
           const validFile = new File(["some-image-content"], "image.png", {
             type: "image/png",
           });
-          const router = createMemoryRouter(routes, {
-            initialEntries: [PAGES.HOME.path],
-          });
 
           const { getByRole, getByPlaceholderText } = renderWithRouter({
-            router,
+            routerOptions: DEFAULT_ROUTER_OPTIONS,
           });
 
           const imageInput = getByRole("button");
