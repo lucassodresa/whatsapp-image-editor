@@ -1,5 +1,5 @@
 import { fireEvent, renderWithRouter } from "@/utils/test";
-import { PAGES } from "../routes";
+import { PAGES } from "@/routes";
 import { describe, it, expect } from "vitest";
 
 const DEFAULT_ROUTER_OPTIONS = {

@@ -17,7 +17,7 @@ type RouterOptions = {
   initialIndex?: number;
 };
 
-export const HydrateAtoms = ({
+const HydrateAtoms = ({
   jotaiInitialValues,
   children,
 }: {
