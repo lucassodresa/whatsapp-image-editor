@@ -1,8 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Canvas } from "../components/canvas";
 import { useNavigate } from "react-router-dom";
 import { useAtomValue } from "jotai";
 import { imageFileSourceAtom } from "@/atoms";
+import { PAGES } from "@/routes";
 // import { useAtom, useAtomValue } from "jotai";
 // import {
 //   imageFileNameAtom,
@@ -196,21 +197,22 @@ export const Edit = () => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!imageFileSource) return navigate("/");
-  }, [navigate, imageFileSource]);
+  const redirectToHome = useCallback(
+    () => navigate(PAGES.HOME.path),
+    [navigate]
+  );
 
-  // const handleClear = () => {
-  //   // setImageFileSource(null);
-  //   setImageFileName("");
-  // };
+  useEffect(() => {
+    if (!imageFileSource) redirectToHome();
+  }, [redirectToHome, imageFileSource]);
 
   return (
     <main className="w-dvw h-dvh flex flex-col  items-center">
       <aside className="flex justify-between p-4 w-full mx-auto">
-        <a
+        <button
           className="btn btn-square btn-error"
           aria-label="Clear image uploaded"
+          onClick={redirectToHome}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -226,7 +228,7 @@ export const Edit = () => {
               d="M6 18 18 6M6 6l12 12"
             />
           </svg>
-        </a>
+        </button>
         {/* <ul>
           <li>
             <button

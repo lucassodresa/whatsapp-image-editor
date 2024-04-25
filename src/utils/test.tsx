@@ -55,14 +55,14 @@ const customRenderRoute = ({
   routerOptions: RouterOptions;
 }) => {
   const router = createMemoryRouter(routes, { ...routerOptions });
+  render(
+    <TestProvider
+      jotaiInitialValues={jotaiInitialValues ?? []}
+      router={router}
+    />
+  );
 
   return {
-    ...render(
-      <TestProvider
-        jotaiInitialValues={jotaiInitialValues ?? []}
-        router={router}
-      />
-    ),
     router,
   };
 };

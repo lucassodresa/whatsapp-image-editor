@@ -1,6 +1,7 @@
 import { imageFileSourceAtom } from "@/atoms";
 import { PAGES } from "@/routes";
-import { renderWithRouter } from "@/utils/test";
+import { renderWithRouter, screen } from "@/utils/test";
+import { act } from "react-dom/test-utils";
 import { describe, it, expect } from "vitest";
 
 const DEFAULT_ROUTER_OPTIONS = {
@@ -24,50 +25,73 @@ describe("Edit page", () => {
       expect(router.state.location.pathname).toBe(PAGES.HOME.path);
     });
   });
+
   describe("when an image file is provided", () => {
     describe("Header", () => {
-      describe("Clear image Button", () => {
+      describe("Clear image button", () => {
         it("should have the correct aria text", () => {
-          const { getByLabelText } = renderWithRouter({
+          renderWithRouter({
             routerOptions: DEFAULT_ROUTER_OPTIONS,
             jotaiInitialValues: [[imageFileSourceAtom, validFile as never]],
           });
 
-          const goBackButton = getByLabelText("Clear image uploaded");
+          const goBackButton = screen.getByLabelText("Clear image uploaded");
           expect(goBackButton).toBeInTheDocument();
         });
 
-        it.todo("should be a <button> tag");
+        it("should be a <button> tag", () => {
+          renderWithRouter({
+            routerOptions: DEFAULT_ROUTER_OPTIONS,
+            jotaiInitialValues: [[imageFileSourceAtom, validFile as never]],
+          });
+
+          const goBackButton = screen.getByLabelText("Clear image uploaded");
+          expect(goBackButton?.tagName.toLowerCase()).toBe("button");
+        });
+
+        describe("when clicked", () => {
+          it("should redirect to home page", () => {
+            const { router } = renderWithRouter({
+              routerOptions: DEFAULT_ROUTER_OPTIONS,
+              jotaiInitialValues: [[imageFileSourceAtom, validFile as never]],
+            });
+
+            const goBackButton = screen.getByLabelText("Clear image uploaded");
+            act(() => {
+              goBackButton.click();
+            });
+
+            expect(router.state.location.pathname).toBe(PAGES.HOME.path);
+          });
+
+          it("should clear the image file", () => {
+            renderWithRouter({
+              routerOptions: DEFAULT_ROUTER_OPTIONS,
+              jotaiInitialValues: [[imageFileSourceAtom, validFile as never]],
+            });
+
+            const goBackButton = screen.getByLabelText("Clear image uploaded");
+            act(() => {
+              goBackButton.click();
+            });
+
+            const imageInput = screen.getByRole("button") as HTMLInputElement;
+            expect(imageInput.files).toHaveLength(0);
+          });
+        });
       });
     });
 
     describe("Canvas", () => {
-      it("should render", () => {
-        const { getByTestId } = renderWithRouter({
-          routerOptions: DEFAULT_ROUTER_OPTIONS,
-          jotaiInitialValues: [[imageFileSourceAtom, validFile as never]],
-        });
-
-        const canvas = getByTestId("canvas");
-        expect(canvas).toBeInTheDocument();
-      });
       it("should be a <canvas> tag", () => {
-        const { getByTestId } = renderWithRouter({
+        renderWithRouter({
           routerOptions: DEFAULT_ROUTER_OPTIONS,
           jotaiInitialValues: [[imageFileSourceAtom, validFile as never]],
         });
 
-        const canvas = getByTestId("canvas");
+        const canvas = screen.getByTestId("canvas");
         expect(canvas?.tagName.toLowerCase()).toBe("canvas");
       });
-
-      it.todo("should render the image");
-      it.todo("should allow drawing on the canvas");
-      it.todo("should allow clearing the canvas");
-      it.todo('should allow downloading the image as "png", "jpeg", or "webp"');
-      it.todo('should clear the image when clicking on "Clear" button');
-      it.todo("should render the image with the correct dimensions");
-      it.todo("should render the image with the correct aspect ratio");
     });
   });
 });
