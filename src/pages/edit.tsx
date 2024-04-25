@@ -1,5 +1,8 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Canvas } from "../components/canvas";
+import { useNavigate } from "react-router-dom";
+import { useAtomValue } from "jotai";
+import { imageFileSourceAtom } from "@/atoms";
 // import { useAtom, useAtomValue } from "jotai";
 // import {
 //   imageFileNameAtom,
@@ -184,12 +187,18 @@ import { Canvas } from "../components/canvas";
 
 export const Edit = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  // const [imageFileName, setImageFileName] = useAtom(imageFileNameAtom);
+  const imageFileSource = useAtomValue(imageFileSourceAtom);
   // const [isDrawing, setIsDrawing] = useAtom(isDrawingAtom);
 
   // const { generateDownloadCanvasByImageType } = useCanvas({
   //   canvasRef,
   // });
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!imageFileSource) return navigate("/");
+  }, [navigate, imageFileSource]);
 
   // const handleClear = () => {
   //   // setImageFileSource(null);
@@ -198,8 +207,11 @@ export const Edit = () => {
 
   return (
     <main className="w-dvw h-dvh flex flex-col  items-center">
-      {/* <aside className="flex justify-between p-4 w-full mx-auto">
-        <button className="btn btn-square btn-error" onClick={handleClear}>
+      <aside className="flex justify-between p-4 w-full mx-auto">
+        {/* <button
+          className="btn btn-square btn-error"
+          aria-label="Clear image file"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -214,8 +226,8 @@ export const Edit = () => {
               d="M6 18 18 6M6 6l12 12"
             />
           </svg>
-        </button>
-        <ul>
+        </button> */}
+        {/* <ul>
           <li>
             <button
               className={clsx(
@@ -240,8 +252,8 @@ export const Edit = () => {
               </svg>
             </button>
           </li>
-        </ul>
-      </aside> */}
+        </ul> */}
+      </aside>
       <Canvas ref={canvasRef} />
 
       {/*
