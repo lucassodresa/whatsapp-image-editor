@@ -7,9 +7,9 @@ import { Canvas } from "../components/canvas";
 //   lineColorAtom,
 //   lineSizeAtom,
 // } from "../atoms";
-import { VALID_IMAGE_TYPES, useCanvas } from "../hooks/use-canvas";
-import { imageFileNameAtom } from "../atoms";
-import { useAtom } from "jotai";
+// import { VALID_IMAGE_TYPES, useCanvas } from "../hooks/use-canvas";
+// import { imageFileNameAtom } from "../atoms";
+// import { useAtom } from "jotai";
 // import clsx from "clsx";
 
 // const COLOR_OPTIONS = [
@@ -184,12 +184,12 @@ import { useAtom } from "jotai";
 
 export const Edit = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [imageFileName, setImageFileName] = useAtom(imageFileNameAtom);
+  // const [imageFileName, setImageFileName] = useAtom(imageFileNameAtom);
   // const [isDrawing, setIsDrawing] = useAtom(isDrawingAtom);
 
-  const { generateDownloadCanvasByImageType } = useCanvas({
-    canvasRef,
-  });
+  // const { generateDownloadCanvasByImageType } = useCanvas({
+  //   canvasRef,
+  // });
 
   // const handleClear = () => {
   //   // setImageFileSource(null);
@@ -243,6 +243,8 @@ export const Edit = () => {
         </ul>
       </aside> */}
       <Canvas ref={canvasRef} />
+
+      {/*
 
       <div className="join">
         <label className="input input-bordered flex items-center gap-2 join-item">
@@ -312,6 +314,7 @@ export const Edit = () => {
           </ul>
         </div>
       </div>
+    */}
     </main>
   );
 };
