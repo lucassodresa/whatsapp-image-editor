@@ -7,6 +7,10 @@ const DEFAULT_ROUTER_OPTIONS = {
   initialEntries: [PAGES.EDIT.path],
 };
 
+const validFile = new File(["some-image-content"], "image.png", {
+  type: "image/png",
+});
+
 describe("Edit page", () => {
   describe("when no image file is provided", () => {
     it("should redirect to home page", () => {
@@ -22,27 +26,23 @@ describe("Edit page", () => {
   });
   describe("when an image file is provided", () => {
     describe("Header", () => {
-      it("should render go back button", () => {
-        const validFile = new File(["some-image-content"], "image.png", {
-          type: "image/png",
+      describe("Clear image Button", () => {
+        it("should have the correct aria text", () => {
+          const { getByLabelText } = renderWithRouter({
+            routerOptions: DEFAULT_ROUTER_OPTIONS,
+            jotaiInitialValues: [[imageFileSourceAtom, validFile as never]],
+          });
+
+          const goBackButton = getByLabelText("Clear image uploaded");
+          expect(goBackButton).toBeInTheDocument();
         });
 
-        const { getByLabelText } = renderWithRouter({
-          routerOptions: DEFAULT_ROUTER_OPTIONS,
-          jotaiInitialValues: [[imageFileSourceAtom, validFile as never]],
-        });
-
-        const goBackButton = getByLabelText("Go back to previous page");
-        expect(goBackButton).toBeInTheDocument();
+        it.todo("should be a <button> tag");
       });
     });
 
     describe("Canvas", () => {
       it("should render", () => {
-        const validFile = new File(["some-image-content"], "image.png", {
-          type: "image/png",
-        });
-
         const { getByTestId } = renderWithRouter({
           routerOptions: DEFAULT_ROUTER_OPTIONS,
           jotaiInitialValues: [[imageFileSourceAtom, validFile as never]],
@@ -52,10 +52,6 @@ describe("Edit page", () => {
         expect(canvas).toBeInTheDocument();
       });
       it("should be a <canvas> tag", () => {
-        const validFile = new File(["some-image-content"], "image.png", {
-          type: "image/png",
-        });
-
         const { getByTestId } = renderWithRouter({
           routerOptions: DEFAULT_ROUTER_OPTIONS,
           jotaiInitialValues: [[imageFileSourceAtom, validFile as never]],

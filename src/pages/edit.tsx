@@ -208,9 +208,9 @@ export const Edit = () => {
   return (
     <main className="w-dvw h-dvh flex flex-col  items-center">
       <aside className="flex justify-between p-4 w-full mx-auto">
-        {/* <button
+        <a
           className="btn btn-square btn-error"
-          aria-label="Clear image file"
+          aria-label="Clear image uploaded"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -226,7 +226,7 @@ export const Edit = () => {
               d="M6 18 18 6M6 6l12 12"
             />
           </svg>
-        </button> */}
+        </a>
         {/* <ul>
           <li>
             <button
