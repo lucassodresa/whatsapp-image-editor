@@ -1,6 +1,8 @@
 import { fireEvent, renderWithRouter, screen } from "@/utils/test";
 import { PAGES } from "@/routes";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+
+vi.mock("@/utils/canvas", () => ({ drawImage: vi.fn() }));
 
 const DEFAULT_ROUTER_OPTIONS = {
   initialEntries: [PAGES.HOME.path],

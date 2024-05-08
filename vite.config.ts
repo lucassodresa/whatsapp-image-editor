@@ -13,6 +13,9 @@ export default defineConfig({
     globals: true,
     clearMocks: true,
     restoreMocks: true,
+    coverage: {
+      include: ["src/**/*"],
+    },
   },
   plugins: [
     react({ babel: { plugins: [jotaiDebugLabel, jotaiReactRefresh] } }),

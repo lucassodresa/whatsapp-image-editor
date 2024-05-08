@@ -45,11 +45,9 @@ export const useCanvas = ({
   useEffect(() => {
     if (!imageFileSource) return navigate("/");
 
-    if (!canvasRef.current) return;
-
     drawImage({
       imageFile: imageFileSource,
-      canvas: canvasRef.current,
+      canvas: canvasRef.current as HTMLCanvasElement,
     });
   }, [imageFileSource, navigate, canvasRef]);
 
