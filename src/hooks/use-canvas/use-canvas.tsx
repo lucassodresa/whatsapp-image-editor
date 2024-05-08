@@ -3,6 +3,8 @@ import { useMouseDrawLine } from "./hooks";
 import { useAtomValue } from "jotai";
 import { imageFileNameAtom, imageFileSourceAtom } from "../../atoms";
 import { useNavigate } from "react-router-dom";
+import { drawImage } from "@/utils/canvas";
+
 export const VALID_IMAGE_TYPES = ["png", "jpeg", "webp"];
 type ImageType = (typeof VALID_IMAGE_TYPES)[number];
 
@@ -40,48 +42,16 @@ export const useCanvas = ({
     [canvasRef, imageFileName]
   );
 
-  const drawImage = useCallback(
-    (imageFile: File) => {
-      if (!imageFile) {
-        console.error("Image file does not exists");
-        return;
-      }
-
-      const canvas = canvasRef?.current;
-      if (!canvas) {
-        console.error("Canvas does not exists");
-        return;
-      }
-
-      const context = canvas?.getContext?.("2d");
-      if (!context) {
-        console.error("Canvas context does not exists");
-        return;
-      }
-
-      const image = new Image();
-      image.onload = () => {
-        canvas.width = image.width;
-        canvas.height = image.height;
-
-        context.drawImage(image, 0, 0, image.width, image.height);
-      };
-
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(imageFile);
-
-      fileReader.onload = ({ target }) => {
-        image.src = target?.result as string;
-      };
-    },
-    [canvasRef]
-  );
-
   useEffect(() => {
     if (!imageFileSource) return navigate("/");
 
-    drawImage(imageFileSource);
-  }, [imageFileSource, navigate, drawImage]);
+    if (!canvasRef.current) return;
+
+    drawImage({
+      imageFile: imageFileSource,
+      canvas: canvasRef.current,
+    });
+  }, [imageFileSource, navigate, canvasRef]);
 
   return {
     generateDownloadCanvasByImageType,

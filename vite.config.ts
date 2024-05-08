@@ -7,12 +7,12 @@ import { fileURLToPath } from "node:url";
 
 export default defineConfig({
   test: {
-    clearMocks: true,
-    restoreMocks: true,
+    setupFiles: ["src/vitest.setup.ts"],
     environment: "jsdom",
     exclude: ["node_modules"],
-    setupFiles: ["src/test-setup.ts"],
     globals: true,
+    clearMocks: true,
+    restoreMocks: true,
   },
   plugins: [
     react({ babel: { plugins: [jotaiDebugLabel, jotaiReactRefresh] } }),

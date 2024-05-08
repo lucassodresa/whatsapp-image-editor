@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAtomValue } from "jotai";
 import { imageFileSourceAtom } from "@/atoms";
 import { PAGES } from "@/routes";
+import { useCanvas } from "@/hooks/use-canvas";
 // import { useAtom, useAtomValue } from "jotai";
 // import {
 //   imageFileNameAtom,
@@ -191,9 +192,9 @@ export const Edit = () => {
   const imageFileSource = useAtomValue(imageFileSourceAtom);
   // const [isDrawing, setIsDrawing] = useAtom(isDrawingAtom);
 
-  // const { generateDownloadCanvasByImageType } = useCanvas({
-  //   canvasRef,
-  // });
+  useCanvas({
+    canvasRef,
+  });
 
   const navigate = useNavigate();
 

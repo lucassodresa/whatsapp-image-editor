@@ -1,8 +1,11 @@
 import { imageFileSourceAtom } from "@/atoms";
 import { PAGES } from "@/routes";
+import { drawImage } from "@/utils/canvas";
 import { renderWithRouter, screen } from "@/utils/test";
 import { act } from "react-dom/test-utils";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+
+vi.mock("@/utils/canvas", () => ({ drawImage: vi.fn() }));
 
 const DEFAULT_ROUTER_OPTIONS = {
   initialEntries: [PAGES.EDIT.path],
@@ -91,6 +94,15 @@ describe("Edit page", () => {
 
         const canvas = screen.getByTestId("canvas");
         expect(canvas?.tagName.toLowerCase()).toBe("canvas");
+      });
+
+      it("should draw the image on the canvas", () => {
+        renderWithRouter({
+          routerOptions: DEFAULT_ROUTER_OPTIONS,
+          jotaiInitialValues: [[imageFileSourceAtom, validFile as never]],
+        });
+
+        expect(drawImage).toHaveBeenCalled();
       });
     });
   });
