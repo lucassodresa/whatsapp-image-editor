@@ -1,5 +1,5 @@
 import { vi } from "vitest";
-import { drawImage } from "./canvas";
+import { drawImage, toBase64 } from "./canvas";
 
 describe("canvas", () => {
   describe("drawImage", () => {
@@ -40,21 +40,47 @@ describe("canvas", () => {
       expect(consoleSpy).toHaveBeenCalledWith("Canvas context does not exists");
     });
 
-    it("should draw an image on the canvas", async () => {
-      const imageFile = new File([], "image.jpg");
-      const canvas = {
-        getContext: () => context,
-      } as never as HTMLCanvasElement;
+    describe("when canvas exists", () => {
+      it("should set the image src", async () => {
+        const imageFile = new File(["some-content"], "image.jpg");
+        const expectedSrc = await toBase64(imageFile);
 
-      const context = {
-        drawImage: vi.fn(),
-      } as never as CanvasRenderingContext2D;
+        const canvas = {
+          getContext: () => context,
+        } as never as HTMLCanvasElement;
 
-      vi.spyOn(canvas, "getContext").mockReturnValue(context);
+        const context = {
+          drawImage: vi.fn(),
+        } as never as CanvasRenderingContext2D;
 
-      await drawImage({ imageFile, canvas });
+        vi.spyOn(canvas, "getContext").mockReturnValue(context);
 
-      expect(context.drawImage).toHaveBeenCalled();
+        const image = {
+          src: "",
+        } as never as HTMLImageElement;
+        vi.spyOn(window, "Image").mockReturnValue(image);
+
+        await drawImage({ imageFile, canvas });
+
+        expect(image.src).toBe(expectedSrc);
+      });
+
+      it("should draw an image", async () => {
+        const imageFile = new File([], "image.jpg");
+        const canvas = {
+          getContext: () => context,
+        } as never as HTMLCanvasElement;
+
+        const context = {
+          drawImage: vi.fn(),
+        } as never as CanvasRenderingContext2D;
+
+        vi.spyOn(canvas, "getContext").mockReturnValue(context);
+
+        await drawImage({ imageFile, canvas });
+
+        expect(context.drawImage).toHaveBeenCalled();
+      });
     });
   });
 });
