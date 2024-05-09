@@ -5,6 +5,7 @@ import {
 } from "util";
 import { fetch, Request, Response, Headers } from "@remix-run/web-fetch";
 import { AbortController as NodeAbortController } from "abort-controller";
+import { vi } from "vitest";
 
 // @ts-expect-error  globalThis.IS_REACT_ACT_ENVIRONMENT is not available in the global scope
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
@@ -31,3 +32,24 @@ if (!globalThis.TextEncoder || !globalThis.TextDecoder) {
   // @ts-expect-error  TextDecoder is not available in the global scope
   globalThis.TextDecoder = NodeTextDecoder;
 }
+
+const imageInstance = new Image();
+const getContextMock = {
+  drawImage: vi.fn(),
+} as never as CanvasRenderingContext2D;
+
+beforeEach(() => {
+  vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(
+    getContextMock
+  );
+
+  vi.spyOn(window, "Image").mockImplementation(() => {
+    imageInstance.width = 100;
+    imageInstance.height = 200;
+    imageInstance.src = "some-src";
+
+    return imageInstance;
+  });
+
+  vi.spyOn(console, "error").mockImplementation(() => {});
+});
